@@ -74,6 +74,11 @@ module.exports = {
         I.dragSlider('#palette_node_notification', 700);
     },
 
+    addMultiActuate() {
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-output');
+        I.dragSlider('#palette_node_multi_actuate', 700);
+    },
 
     async connectFlows() {
         ids = await I.grabAttributeFrom('.nodegroup', 'id');
@@ -170,5 +175,128 @@ module.exports = {
         await I.sendMQTTMessage(deviceId, '{"input": "input value"}');
     },
 
+    //Fluxo Sanity
+    clickFlowCreated(nameFlow){
+        I.click(locate('a').withAttr({ href: '#/flows' }));
+        I.click(locate('span').withAttr({title: nameFlow}))
+        I.wait(3)
+    },
+
+    clickRemoveFlow(nameFlow){  
+        I.click(locate('span').withAttr({title: nameFlow})) 
+        I.click(locate('div').withAttr({ title: 'Remove Flow' }));
+        I.click(locate('.confirm-modal button').withAttr({ title: "Remove" }))
+        I.wait(3)
+    },
+
+    addTemplateIn(){
+        I.dragSlider('#palette_node_event_template_in', 200);
+    },
+
+    addNodeHTTP(){
+        I.dragSlider('#palette_node_http', 400);
+    },
+
+    addChange2() {
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-function');
+        I.dragSlider('#palette_node_change', 600);
+    },
+
+    addNodeEventDeviceIn(){
+        I.dragSlider('#palette_node_event_device_in', 300);
+    },
+
+    addFTPRequest(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-output');
+        I.dragSlider('#palette_node_ftp', 400)
+    },
+
+    addSwitch(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-function');
+        I.dragSlider('#palette_node_switch', 600);
+    },
+
+    addActuate(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-deprecated_nodes');
+        I.dragSlider('#palette_node_actuate', 800)
+    },
+
+    addTemplate(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-function');
+        I.dragSlider('#palette_node_template', 200);
+    },
+
+    addMergeData(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-function');
+        I.dragSlider('#palette_node_merge_data', 400);
+    },
+
+    addPublishInFTPTopic(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-output');
+        I.dragSlider('#palette_node_publish-ftp', 600)
+    },
+
+    addCumulativeSum(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-function');
+        I.dragSlider('#palette_node_cumulative_sum', 100)
+    },
+
+    addCron(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-function');
+        I.dragSlider('#palette_node_cron', 300);
+    },
+
+    addCronBatch(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-function');
+        I.dragSlider('#palette_node_cron-batch', 500) 
+    },
+
+    addMultiDeviceOut(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-output');
+        I.dragSlider('#palette_node_multi_device_out', 700)
+    },
+
+    addGeofence(){
+        I.click('#palette-collapse-all');
+        //I.click(locate()'palette-content')
+        I.click('#palette-location')
+        //I.click('#palette-base-category-location')
+        I.dragSlider('#palette_node_geofence', 500)
+        //I.retry(5).click('#palette-header-location');    
+    },
+
+    addGetContext(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-context');
+        I.dragSlider('#palette_node_geofence', 600)
+    },
+
+    addDeviceIn(){
+        I.click('#palette-collapse-all');
+        I.click('#palette-header-deprecated_nodes');
+        I.dragSlider('#palette_node_device_in', 600)
+    },
+
+    seeFlowHasUpdated() {
+        I.see('Flow updated.');
+        I.wait(1);
+    },
+
+    seeFlowRemoved() {
+        I.see('Flow removed.');
+        I.wait(1);
+    },
+    
 
 };

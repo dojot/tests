@@ -16,7 +16,7 @@ const config = {
             fullPageScreenshots: true,
             restart: false,
             keepBrowserState: true,
-            show: false,
+            show: true,
             waitForNavigation: ['networkidle2', 'domcontentloaded'],
             chrome: {
                 args: ['--no-sandbox', '--start-maximized', '--start-fullscreen'],
