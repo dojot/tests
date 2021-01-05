@@ -1,3 +1,4 @@
+// TESTE DEVICE
 Feature('Device CRUD');
 
 Before((login) => {
