@@ -1,0 +1,58 @@
+{
+  "name": "e2e-gui-v1",
+  "version": "0.0.1",
+  "description": "End to end tests - GUI v1",
+  "private": true,
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/codeceptjs --config=tests/acceptance/codecept.conf.js run --steps",
+    "test:basic": "./node_modules/.bin/codeceptjs --config=tests/acceptance/codecept.conf.js run --steps --grep @basic",
+    "test:adv": "./node_modules/.bin/codeceptjs --config=tests/acceptance/codecept.conf.js run --steps --grep @adv",
+    "test:clearDb": "./node_modules/.bin/codeceptjs --config=tests/acceptance/custom.conf.js run --steps",
+    "test:basic:clearDb": "./node_modules/.bin/codeceptjs --config=tests/acceptance/custom.conf.js run --steps  --grep @basic",
+    "perfomaceTests": "tests/acceptance/performanceTests/runTest.sh",
+    "check-licenses": "apache2-license-checker"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run check-licenses"
+    }
+  },
+  "homepage": "https://github.com/dojot/tests",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dojot/tests"
+  },
+  "keywords": [
+    "dojot",
+    "tests",
+    "acceptance",
+    "end to end",
+    "end2end",
+    "e2d"
+  ],
+  "contributors": [
+    "Mariane Previde",
+    "Anderson Luis Ribeiro",
+    "Francisco Angelo Cabelo",
+    "Franciele Pereira da Silva Navarro"
+  ],
+  "license": "Apache-2.0",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "devDependencies": {
+    "@bbc/apache2-license-checker": "^1.1.4",
+    "async-mqtt": "^2.2.1",
+    "codeceptjs": "^2.0.8",
+    "husky": "^4.3.6",
+    "mqtt": "^2.18.8",
+    "puppeteer": "^1.13.0",
+    "sync-request": "^6.1.0"
+  }
+}
