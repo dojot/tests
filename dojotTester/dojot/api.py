@@ -182,7 +182,7 @@ class DojotAPI():
     @staticmethod
     def create_group(jwt: str, group: str) -> str:
         """
-        Create a flow in Dojot.
+        Create a group in Dojot.
 
         Parameters:
             jwt: JWT authorization.
@@ -206,6 +206,8 @@ class DojotAPI():
 
         LOGGER.debug("... group created")
         return result_code, res["id"] if result_code == 200 else res
+
+
 
     @staticmethod
     def get_deviceid_by_label(jwt: str, label: str) -> str:
@@ -253,6 +255,25 @@ class DojotAPI():
         DojotAPI.call_api(requests.delete, args)
 
         LOGGER.debug("... deleted devices")
+
+    @staticmethod
+    def delete_device(jwt: str, label: str) -> None:
+        """
+        Delete device.
+        """
+        # FIXME
+        LOGGER.debug("Deleting device...")
+
+        args = {
+            "url": "{0}/device/{1}".format(CONFIG['dojot']['url'], label),
+            "headers": {
+                "Authorization": "Bearer {0}".format(jwt),
+            },
+        }
+
+        DojotAPI.call_api(requests.delete, args)
+
+        LOGGER.debug("... deleted device")
 
     @staticmethod
     def delete_templates(jwt: str) -> None:
