@@ -2630,9 +2630,35 @@ class SanityTest(BaseTest):
                   "description": "Grupo com acesso somente para visualizar as informações"}
         group1_id = Api.create_group(jwt, group1)
 
+        self.logger.info("Groups created. IDs: " + str(group1_id))
+
         #TODO adicionar as permissoes ao grupo
-        #TODO adicionar usuario
+
+        Api.add_permission(jwt, group1_id, "2")
+
+        # adicionar usuario
+
+        user1 = {
+            "username": "bete",
+            "service": "teste",
+            "email": "bete@noemail.com",
+            "name": "Elisabete",
+            "profile": "admin"
+            }
+        Api.create_user(jwt, user1)
+
+        user2 = {
+            "username": "maria",
+            "service": "teste",
+            "email": "maria@noemail.com",
+            "name": "Maria",
+            "profile": "admin"
+            }
+        Api.create_user(jwt, user2)
+
         #TODO listar tenants
+
+        # publicações
 
         dev1_id = Api.get_deviceid_by_label(jwt, "linha_1")
         dev1_topic = "admin:" + dev1_id + "/attrs"
@@ -2805,7 +2831,7 @@ class SanityTest(BaseTest):
         time.sleep(2)
 
         # create device linha_4
-        devices.append(([template_ids[5]], "linha_4"))
+        Api.create_device(jwt, [template_ids[5]], "linha_4")
 
         # update device linha_4
         # delete device linha_4

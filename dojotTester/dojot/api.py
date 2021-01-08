@@ -205,9 +205,66 @@ class DojotAPI():
         result_code, res = DojotAPI.call_api(requests.post, args)
 
         LOGGER.debug("... group created")
+
+        ## o retorno do comando é: {"status": 200, "id": 6}. Como obter só o ID?
+
         return result_code, res["id"] if result_code == 200 else res
 
+    @staticmethod
+    def add_permission(jwt: str, group: str, permission: str) -> str:
+        """
+        Add permission a group in Dojot.
 
+        Parameters:
+            jwt: JWT authorization.
+            group: group receiving permission
+            permission: permission definition
+
+
+        Returns the created group ID.
+        """
+        LOGGER.debug("Adding permission...")
+
+        args = {
+            "url": "{0}/auth/pap/grouppermissions/{1}/{2}".format(CONFIG['dojot']['url'], group, permission),
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {0}".format(jwt),
+            },
+        }
+
+        result_code, res = DojotAPI.call_api(requests.post, args)
+
+        LOGGER.debug("... permission added")
+        return result_code, res["message"] if result_code == 200 else res
+
+    @staticmethod
+    def create_user(jwt: str, user: str) -> str:
+        """
+        Create a group in Dojot.
+
+        Parameters:
+            jwt: JWT authorization.
+            user: user data.
+
+
+        Returns the created user ID.
+        """
+        LOGGER.debug("Creating user...")
+
+        args = {
+            "url": "{0}/auth/user".format(CONFIG['dojot']['url']),
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {0}".format(jwt),
+            },
+            "data": json.dumps(user),
+        }
+
+        result_code, res = DojotAPI.call_api(requests.post, args)
+
+        LOGGER.debug("... user created")
+        # return result_code, res["id"] if result_code==200 else res
 
     @staticmethod
     def get_deviceid_by_label(jwt: str, label: str) -> str:
@@ -322,6 +379,8 @@ class DojotAPI():
         LOGGER.debug("... retrieved the devices")
 
         return devices_ids
+
+
 
     @staticmethod
     def divide_loads(total: int, batch: int) -> List:
