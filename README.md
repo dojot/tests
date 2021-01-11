@@ -10,9 +10,9 @@ TODO
 ### Configuration
 TODO
 
-## Documentation
+## Documentations
 
-Check the documentation for more information:
+Check the documentations for more information:
 
 - [Latest dojot platform documentation](https://dojotdocs.readthedocs.io/en/latest)
 
