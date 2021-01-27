@@ -180,7 +180,7 @@ class DojotAPI():
         return result_code, res["flow"]["id"] if result_code == 200 else res
 
     @staticmethod
-    def create_group(jwt: str, group: str) -> str:
+    def create_group(jwt: str, group: str) -> str: ##Tuple[Any, Any]:
         """
         Create a group in Dojot.
 
@@ -203,6 +203,7 @@ class DojotAPI():
         }
 
         result_code, res = DojotAPI.call_api(requests.post, args)
+
 
         LOGGER.debug("... group created")
 
@@ -241,7 +242,7 @@ class DojotAPI():
     @staticmethod
     def create_user(jwt: str, user: str) -> str:
         """
-        Create a group in Dojot.
+        Create a user in Dojot.
 
         Parameters:
             jwt: JWT authorization.
@@ -264,7 +265,7 @@ class DojotAPI():
         result_code, res = DojotAPI.call_api(requests.post, args)
 
         LOGGER.debug("... user created")
-        # return result_code, res["id"] if result_code==200 else res
+        return result_code, res if result_code == 200 else res
 
     @staticmethod
     def get_deviceid_by_label(jwt: str, label: str) -> str:
@@ -293,6 +294,59 @@ class DojotAPI():
         LOGGER.debug("... retrieved the devices")
 
         return devices_id
+
+    @staticmethod
+    def get_templateid_by_label(jwt: str, label: str) -> str:
+        """
+        Retrieves the template from Dojot.
+
+        Parameters:
+            jwt: Dojot JWT token
+
+        Returns a template ID
+        """
+        LOGGER.debug("Retrieving template...")
+
+        args = {
+            "url": "{0}/template?label={1}".format(CONFIG['dojot']['url'], label),
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {0}".format(jwt),
+            },
+        }
+
+        rc, res = DojotAPI.call_api(requests.get, args)
+
+        LOGGER.debug("... retrieved the template id")
+        return res["attrs"]["template_id"] if rc == 200 else res
+
+
+    @staticmethod
+    def update_template(jwt: str, template_id: int, data: str) -> str:
+        """
+
+        Returns the updated template ID or a error message.
+        """
+        LOGGER.debug("Updating template...")
+
+        if isinstance(data, dict):
+            data = json.dumps(data)
+
+        args = {
+            "url": "{0}/template/{1}".format(CONFIG['dojot']['url'], template_id),
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {0}".format(jwt),
+            },
+            "data": data,
+        }
+
+        result_code, res = DojotAPI.call_api(requests.put, args)
+
+        LOGGER.debug("... updated the template")
+        return result_code, res if result_code==200 else res
+
+
 
     @staticmethod
     def delete_devices(jwt: str) -> None:
@@ -380,6 +434,30 @@ class DojotAPI():
 
         return devices_ids
 
+    @staticmethod
+    def get_history_device(jwt: str, label: str) -> str:
+        """
+        Retrieves device attributes data from Dojot.
+
+        Parameters:
+            jwt: Dojot JWT token
+
+            """
+        LOGGER.debug("Retrieving history...")
+
+        args = {
+            "url": "{0}/history/device/{1}/history".format(CONFIG['dojot']['url'], label),
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {0}".format(jwt),
+            },
+        }
+
+        res = DojotAPI.call_api(requests.get, args)
+
+        LOGGER.debug("... retrieved history")
+
+        return res
 
 
     @staticmethod
