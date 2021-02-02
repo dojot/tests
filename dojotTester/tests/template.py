@@ -13,7 +13,7 @@ class TemplateTest(BaseTest):
 
         return template_id if rc == 200 else None
 
-    def createTemplateFail(self, jwt: str, template: str):
+    def createTemplateFail(self, jwt: str, template: str):  ##criado para não interferir no resultado do createTemplate, usado no append
         rc, res = Api.create_template(jwt, json.dumps(template))
 
         #return rc, res if rc != 200 else res
@@ -26,19 +26,33 @@ class TemplateTest(BaseTest):
 
     def getTemplates(self, jwt: str):
         res = Api.get_templates(jwt)
-        #self.assertTrue(isinstance(template_id, int), "Error on update template")
+        #self.assertTrue(isinstance(template_id, int), "Error on get template")
         return res
 
     def getTemplatesWithParameters(self, jwt: str, attrs: str):
         res = Api.get_templates_with_parameters(jwt, attrs)
-        # self.assertTrue(isinstance(template_id, int), "Error on update template")
+        # self.assertTrue(isinstance(template_id, int), "Error on get template")
         return res
 
     def getTemplate(self, jwt: str, template_id: int):
         res = Api.get_template(jwt, template_id)
-        #self.assertTrue(isinstance(template_id, int), "Error on update template")
+        #self.assertTrue(isinstance(template_id, int), "Error on get template")
         return res
 
+    def getTemplateWithParameters(self, jwt: str, template_id: int, attrs: str):
+        res = Api.get_template_with_parameters(jwt, template_id, attrs)
+        # self.assertTrue(isinstance(template_id, int), "Error on get template")
+        return res
+
+    def deleteTemplates(self, jwt: str):
+        res = Api.delete_templates(jwt)
+        #self.assertTrue(isinstance(template_id, int), "Error on delete template")
+        return res
+
+    def deleteTemplate(self, jwt: str, template_id: int):
+        res = Api.delete_template(jwt, template_id)
+        #self.assertTrue(isinstance(template_id, int), "Error on delete template")
+        return res
 
 
     def runTest(self):
@@ -138,7 +152,6 @@ class TemplateTest(BaseTest):
         self.logger.debug('Template: ' + str(list))
 
 
-        ##FIXME: corrigir get_templateid_by_label para não precisar guardar o template_id
         self.logger.debug('updating template ......')
         template = {
             "label": "SensorModel",
@@ -156,13 +169,14 @@ class TemplateTest(BaseTest):
             ]
         }
 
-        #template_id = Api.get_templateid_by_label(jwt, 'SensorModel')
+        #template_id de 'SensorModel')
         rc, res = self.updateTemplate(jwt, template_id2, template)
         self.logger.info('Template updated: ' + str(template_id2) + ', SensorModel')
 
         self.logger.debug('listing updated template...')
         list = self.getTemplate(jwt, template_id2)
         self.logger.debug('Template: ' + str(list))
+
 
         self.logger.debug('creating template com valores estáticos vazios...')
         template = {
@@ -309,86 +323,125 @@ class TemplateTest(BaseTest):
         self.logger.debug('Template List: ' + str(list))
 
         self.logger.info('listing templates with parameter: page_size...')
-        attrs = {"page_size=5"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "page_size=3")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameter: page_num...')
-        attrs = {"page_num=2"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "page_num=2")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameter: page_size=2&page_num=1...')
-        attrs = {"page_size=2&page_num=1"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=1")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameter: page_size=2&page_num=2...')
-        attrs = {"page_size=2&page_num=2"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=2")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameter: page_size=2&page_num=3...')
-        attrs = {"page_size=2&page_num=3"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=3")
         self.logger.debug('Templates: ' + str(res))
 
-        self.logger.info('listing templates with parameter: ?page_size=2&page_num=4...')
-        attrs = {"page_size=2&page_num=4"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        self.logger.info('listing templates with parameter: page_size=2&page_num=4...')
+        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=4")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameter: attr_format=both...')  #both: attrs + data_attrs
-        attrs = {"attr_format=both"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "attr_format=both")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameter: attr_format=single...')  #single: só attrs
-        attrs = {"attr_format=single"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "attr_format=single")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameter: attr_format=split...')  #split: só data_attrs
-        attrs = {"attr_format=split"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "attr_format=split")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameter: attr...')  #só é válido para atributos estáticos
-        attrs = {"attr=serial=indefinido"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "attr=serial=indefinido")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameter: label...')
-        attrs = {"label=SensorModel"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "label=SensorModel")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameter: sortBy...')
-        attrs = {"sortBy=label"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "sortBy=label")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameters...')
-        attrs = {"page_size=2&page_num=1&attr_format=single&attr=serial=indefinido&label=TiposAtributos&sortBy=label"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=1&attr_format=single&attr=serial=indefinido&label=TiposAtributos&sortBy=label")
         self.logger.debug('Templates: ' + str(res))
 
         self.logger.info('listing templates with parameters (no match): return empty...')
-        attrs = {"page_size=2&page_num=1&attr_format=single&attr=serial=indefinido&label=SensorModel&sortBy=label"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=1&attr_format=single&attr=serial=indefinido&label=SensorModel&sortBy=label")
         self.logger.debug('Templates: ' + str(res))
 
-        self.logger.info('listing templates with parameters - internal error...')
-        attrs = {"/sortBy=label"}
-        res = self.getTemplatesWithParameters(jwt, attrs)
+        self.logger.info('listing templates with parameters (nonexistent parameter ): return full...')
+        res = self.getTemplatesWithParameters(jwt, "parametro=outro")
         self.logger.debug('Templates: ' + str(res))
+
+        """
+        Lista template especifico
+        """
+
+        self.logger.info('listing specific template...')
+        template_id3 = 3 ##template SensorModel
+        res = self.getTemplate(jwt, template_id3)
+        self.logger.debug('Template info: ' + str(res))
+
+        self.logger.info('listing specific template with parameter: attr_format=both...')  # both: attrs + data_attrs
+        res = self.getTemplateWithParameters(jwt, template_id3, "attr_format=both")
+        self.logger.debug('Template info: ' + str(res))
+
+        """
+        attr_format: issue #1967
+        """
+
+        self.logger.info('listing specific template with parameter: attr_format=single...')  # single: só attrs
+        res = self.getTemplateWithParameters(jwt, template_id3, "attr_format=single")
+        self.logger.debug('Template info: ' + str(res))
+
+        """
+        attr_format: issue #1967
+        """
+
+        self.logger.info('listing specific template with parameter: attr_format=split...')  # split: só data_attrs
+        res = self.getTemplateWithParameters(jwt, template_id3, "attr_format=split")
+        self.logger.debug('Template info: ' + str(res))
+
+        """
+        Remove template especifico
+        """
+        template_id = 2  ##precisa criar um device desse template
+        self.logger.info('removing specific template - Templates cannot be removed as they are being used by devices...')
+        res = self.deleteTemplate(jwt, template_id)
+        self.logger.info('Result: ' + str(res))
+
+        self.logger.info('removing specific template...')
+        template_id = 17 ##template Vazio, se o Sanity foi executado antes
+        res = self.deleteTemplate(jwt, template_id)
+        self.logger.info('Result: ' + str(res))
+
+        """
+        Remove all templates
+        """
+
+        ##só remove se não existir devices
+
+        Api.delete_devices(jwt)
+
+        self.logger.info('removing all templates...')
+        res = self.deleteTemplates(jwt)
+        self.logger.debug('Result: ' + str(res))
 
 
         """
         Fluxos Alternativos
         """
 
-        self.logger.debug('creating template sem label...')
+        self.logger.info('creating template sem label...')
         template = {
             "attrs": [
                 {
@@ -400,9 +453,10 @@ class TemplateTest(BaseTest):
         }
 
         res = self.createTemplateFail(jwt, template)
-        self.logger.info(str(res))
+        self.logger.info('Result: ' + str(res))
 
-        self.logger.debug('creating template com metadado repetido...')
+
+        self.logger.info('creating template com metadado repetido...')
         template = {
             "label": "sample",
             "attrs": [
@@ -419,4 +473,49 @@ class TemplateTest(BaseTest):
         }
 
         res = self.createTemplateFail(jwt, template)
-        self.logger.info('Template is not created: ' + str(res))
+        self.logger.info('Result: ' + str(res))
+
+        self.logger.info('updating specific template - No such template...')
+        template = {
+            "label": "Vazio",
+            "attrs": [
+                {
+                    "label": "serial",
+                    "type": "static",
+                    "value_type": "string",
+                    "static_value": "undefined"
+                }
+            ]
+        }
+        template_id = 2
+        res = self.updateTemplate(jwt, template_id, template)
+        self.logger.info('Result: ' + str(res))
+
+        self.logger.info('listing template - No such template...')
+        res = self.getTemplate(jwt, "123")
+        self.logger.info('Result: ' + str(res))
+
+        self.logger.info('listing template - internal error...')
+        res = self.getTemplate(jwt, "abc")
+        self.logger.info('Result: ' + str(res))
+
+        self.logger.info('listing templates with parameter: page_num=0...')
+        res = self.getTemplatesWithParameters(jwt, "page_num=0")
+        self.logger.info('Result: ' + str(res))
+
+        self.logger.info('listing templates with parameter: page_size=0...')
+        res = self.getTemplatesWithParameters(jwt, "page_size=0")
+        self.logger.info('Result: ' + str(res))
+
+
+        self.logger.info('listing templates with parameter: page_size and page_num must be integers...')
+        res = self.getTemplatesWithParameters(jwt, "page_num=xyz&page_size=kwv")
+        self.logger.info('Result: ' + str(res))
+
+        self.logger.info('removing specific template - No such template...')
+        template_id = 2
+        res = self.deleteTemplate(jwt, template_id)
+        self.logger.info('Result: ' + str(res))
+
+
+
