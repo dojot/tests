@@ -7,6 +7,25 @@ import time
 
 class DeviceTest(BaseTest):
 
+    def createTemplates(self, jwt: str, templates: list):
+        template_ids = []
+        for template in templates:
+            rc, template_id = Api.create_template(jwt, json.dumps(template))
+            self.assertTrue(isinstance(template_id, int), "Error on create template")
+
+            template_ids.append(template_id) if rc == 200 else template_ids.append(None)
+        return template_ids
+
+    def createDevices(self, jwt: str, devices: list):
+        device_ids = []
+
+        for templates, label in devices:
+            self.logger.info('adding device ' + label + ' using templates ' + str(templates))
+            rc, device_id = Api.create_device(jwt, templates, label)
+            self.assertTrue(device_id is not None, "Error on create device")
+            device_ids.append(device_id) if rc == 200 else device_ids.append(None)
+
+        return device_ids
 
 
     def createSingleDevice(self, jwt: str, template_id: int, label: str):
@@ -74,7 +93,10 @@ class DeviceTest(BaseTest):
 
 
         self.logger.info('creating template com todos os tipos de atributos...')
-        template = {
+
+        templates = []
+        self.logger.debug('creating templates...')
+        templates.append({
             "label": "Template",
             "attrs": [
                 {
@@ -127,24 +149,43 @@ class DeviceTest(BaseTest):
                     "value_type": "object"
                 }
             ]
-        }
+        })
+        templates.append({
+            "label": "SensorModel",
+            "attrs": [
+                {
+                    "label": "temperature",
+                    "type": "dynamic",
+                    "value_type": "float"
+                },
+                {
+                    "label": "model-id",
+                    "type": "static",
+                    "value_type": "string",
+                    "static_value": "model-001"
+                }
+                ]
+        })
 
-        rc, template_id = Api.create_template(jwt, template)
-        self.logger.info('Template created: ' + str(template_id) + ', Template')
+        template_ids = self.createTemplates(jwt, templates)
+        self.logger.info("templates ids: " + str(template_ids))
 
-        device_id = self.createSingleDevice(jwt, template_id, 'dispositivo')
-        self.logger.info('Device created: ' + str(device_id))
+        devices = []
+        devices.append(([template_ids[0]], "dispositivo"))
+        devices.append(([template_ids[1]], "sensor"))
+        devices_ids = self.createDevices(jwt, devices)
+        self.logger.info("devices ids: " + str(devices_ids))
 
         #TODO: 'listing device - by ID...'
 
-        """
+
         self.logger.info('listing device - by ID...')
-        list = self.getDevice(jwt, '82bbef')
+        list = self.getDevice(jwt, Api.get_deviceid_by_label(jwt, 'dispositivo'))
         self.logger.info('Device info: ' + str(list))
-        """
+
 
         self.logger.info('listing device - by label...')
-        list = self.getDevice(jwt, 'label=dispositivo')
+        list = self.getDevice(jwt, Api.get_deviceid_by_label(jwt, "dispositivo"))
         self.logger.info('Device info: ' + str(list))
 
         """
@@ -175,15 +216,15 @@ class DeviceTest(BaseTest):
         """
 
         self.logger.info('creating multiple devices...')
-        device_list = self.createMultipleDevices(jwt, template_id, 'test_device', "count=5")
+        device_list = self.createMultipleDevices(jwt, template_ids[1], 'test_device', "count=5")
         self.logger.info('Devices created: ' + str(device_list))
 
         self.logger.info('creating devices with verbose=False ...')
-        device_list = self.createMultipleDevices(jwt, template_id, 'test_verbose_false', "verbose=False")
+        device_list = self.createMultipleDevices(jwt, template_ids[1], 'test_verbose_false', "verbose=False")
         self.logger.debug('Device created: ' + str(device_list))
 
         self.logger.info('creating devices with verbose=True ...')
-        device_list = self.createMultipleDevices(jwt, template_id, 'test_verbose_true', "verbose=True")
+        device_list = self.createMultipleDevices(jwt, template_ids[1], 'test_verbose_true', "verbose=True")
         self.logger.debug('Device created: ' + str(device_list))
 
         """
@@ -220,7 +261,7 @@ class DeviceTest(BaseTest):
 
         self.logger.info('listing devices with parameter: idsOnly=true...')
         res = self.getDevicesWithParameters(jwt, "idsOnly=true")
-        self.logger.debug('Devices: ' + str(res))
+        self.logger.info('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: idsOnly=false...')
         res = self.getDevicesWithParameters(jwt, "idsOnly=false")
@@ -280,7 +321,7 @@ class DeviceTest(BaseTest):
         """
 
         self.logger.info('listing specific device - device_id...')
-        res = self.getDevice(jwt, '5a201d')
+        res = self.getDevice(jwt, Api.get_deviceid_by_label(jwt, 'sensor'))
         self.logger.debug('Device info: ' + str(res))
 
         self.logger.info('listing specific device - label...')
@@ -315,11 +356,11 @@ class DeviceTest(BaseTest):
         Fluxos Alternativos
         """
         self.logger.info('creating devices with count & verbose ...')
-        result = self.createMultipleDevices(jwt, template_id, 'test', "count=3&verbose=true")
+        result = self.createMultipleDevices(jwt, template_ids[1], 'test', "count=3&verbose=true")
         self.logger.info('Result: ' + str(result))
 
         self.logger.info('creating devices - count must be integer ...')
-        result = self.createMultipleDevices(jwt, template_id, 'test', "count=true")
+        result = self.createMultipleDevices(jwt, template_ids[1], 'test', "count=true")
         self.logger.info('Result: ' + str(result))
 
         #TODO: 'creating devices - Payload must be valid JSON...' (tem como provocar o erro?)

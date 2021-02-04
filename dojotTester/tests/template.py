@@ -7,11 +7,35 @@ import time
 
 class TemplateTest(BaseTest):
 
-    def createTemplate(self, jwt: str, template: str):
-        rc, template_id = Api.create_template(jwt, json.dumps(template))
-        self.assertTrue(isinstance(template_id, int), "Error on create template")
+    """
+    Cria templates:
+        - TiposAtributos
+        - Vazio
+        - SensorModel
+        - valores estáticos vazios
+        - firmware_update
+    """
 
-        return template_id if rc == 200 else None
+
+    def createTemplates(self, jwt: str, templates: list):
+        template_ids = []
+        for template in templates:
+            rc, template_id = Api.create_template(jwt, json.dumps(template))
+            self.assertTrue(isinstance(template_id, int), "Error on create template")
+
+            template_ids.append(template_id) if rc == 200 else template_ids.append(None)
+        return template_ids
+
+    def createDevices(self, jwt: str, devices: list):
+        device_ids = []
+
+        for templates, label in devices:
+            self.logger.info('adding device ' + label + ' using templates ' + str(templates))
+            rc, device_id = Api.create_device(jwt, templates, label)
+            self.assertTrue(device_id is not None, "Error on create device")
+            device_ids.append(device_id) if rc == 200 else device_ids.append(None)
+
+        return device_ids
 
     def createTemplateFail(self, jwt: str, template: str):  ##criado para não interferir no resultado do createTemplate, usado no append
         rc, res = Api.create_template(jwt, json.dumps(template))
@@ -60,12 +84,9 @@ class TemplateTest(BaseTest):
         self.logger.debug('getting jwt...')
         jwt = Api.get_jwt()
 
-        self.logger.debug('listing all templates...')
-        list = self.getTemplates(jwt)
-        self.logger.debug('Templates: ' + str(list))
-
-        self.logger.debug('creating template com todos os tipos de atributos...')
-        template = {
+        templates = []
+        self.logger.debug('creating templates...')
+        templates.append({
             "label": "TiposAtributos",
             "attrs": [
                 {
@@ -86,7 +107,15 @@ class TemplateTest(BaseTest):
                 {
                     "label": "gps",
                     "type": "dynamic",
-                    "value_type": "geo:point"
+                    "value_type": "geo:point",
+                    "metadata": [
+                        {
+                            "label": "descricao",
+                            "type": "static",
+                            "value_type": "string",
+                            "static_value": "localizacao do device"
+                        }
+                    ]
                 },
                 {
                     "label": "bool",
@@ -110,24 +139,12 @@ class TemplateTest(BaseTest):
                     "value_type": "object"
                 }
                 ]
-        }
-
-        template_id = self.createTemplate(jwt, template)
-        self.logger.info('Template created: ' + str(template_id) + ', TiposAtributos')
-
-
-        self.logger.debug('creating template vazio...')
-        template = {
+        })
+        templates.append({
             "label": "Vazio",
             "attrs": []
-        }
-
-        template_id = self.createTemplate(jwt, template)
-        self.logger.info('Template created: ' + str(template_id) + ', Vazio')
-
-
-        self.logger.debug('creating and updating template ......')
-        template = {
+        })
+        templates.append({
             "label": "SensorModel",
             "attrs": [
                 {
@@ -142,44 +159,8 @@ class TemplateTest(BaseTest):
                     "static_value": "model-001"
                 }
                 ]
-        }
-
-        template_id2 = self.createTemplate(jwt, template)
-        self.logger.info('Template created: ' + str(template_id2) + ', SensorModel')
-
-        self.logger.debug('listing created template...')
-        list = self.getTemplate(jwt, template_id2)
-        self.logger.debug('Template: ' + str(list))
-
-
-        self.logger.debug('updating template ......')
-        template = {
-            "label": "SensorModel",
-            "attrs": [
-                {
-                    "label": "led",
-                    "type": "dynamic",
-                    "value_type": "bool"
-                },
-                {
-                    "label": "fan",
-                    "type": "dynamic",
-                    "value_type": "bool"
-                }
-            ]
-        }
-
-        #template_id de 'SensorModel')
-        rc, res = self.updateTemplate(jwt, template_id2, template)
-        self.logger.info('Template updated: ' + str(template_id2) + ', SensorModel')
-
-        self.logger.debug('listing updated template...')
-        list = self.getTemplate(jwt, template_id2)
-        self.logger.debug('Template: ' + str(list))
-
-
-        self.logger.debug('creating template com valores estáticos vazios...')
-        template = {
+        })
+        templates.append({
             "label": "valores estaticos vazios",
             "attrs": [
                 {
@@ -195,14 +176,8 @@ class TemplateTest(BaseTest):
                     "value_type": "geo:point"
                 }
                 ]
-        }
-
-        res = self.createTemplate(jwt, template)
-        self.logger.info('Template created: ' + str(res) + ', valores estaticos vazios')
-
-
-        self.logger.debug('creating template firmware_update...')
-        template = {
+        })
+        templates.append({
             "label": "firmware_update",
             "attrs": [
                 {
@@ -307,10 +282,40 @@ class TemplateTest(BaseTest):
                     ]
                 }
             ]
+        })
+
+
+        template_ids = self.createTemplates(jwt, templates)
+        self.logger.info("templates ids: " + str(template_ids))
+
+        """
+        self.logger.debug('updating template SensorModel......')
+        template = {
+            "label": "SensorModel",
+            "attrs": [
+                {
+                    "label": "led",
+                    "type": "dynamic",
+                    "value_type": "bool"
+                },
+                {
+                    "label": "fan",
+                    "type": "dynamic",
+                    "value_type": "bool"
+                }
+            ]
         }
 
-        template_id = self.createTemplate(jwt, template)
-        self.logger.info('Template created: ' + str(template_id) + ', firmware_update')
+        #template_id de 'SensorModel'
+        rc, res = self.updateTemplate(jwt, template_id2, template)
+        self.logger.info('Template updated: ' + str(template_id2) + ', SensorModel')
+
+        self.logger.debug('listing updated template...')
+        list = self.getTemplate(jwt, template_id2)
+        self.logger.debug('Template: ' + str(list))
+
+        """
+
 
         #TODO: adicionar imagem (endpoints /image e /binary)
 
@@ -387,12 +392,12 @@ class TemplateTest(BaseTest):
         """
 
         self.logger.info('listing specific template...')
-        template_id3 = 3 ##template SensorModel
-        res = self.getTemplate(jwt, template_id3)
+        ##template SensorModel
+        res = self.getTemplate(jwt, template_ids[2])
         self.logger.debug('Template info: ' + str(res))
 
         self.logger.info('listing specific template with parameter: attr_format=both...')  # both: attrs + data_attrs
-        res = self.getTemplateWithParameters(jwt, template_id3, "attr_format=both")
+        res = self.getTemplateWithParameters(jwt, template_ids[2], "attr_format=both")
         self.logger.debug('Template info: ' + str(res))
 
         """
@@ -400,7 +405,7 @@ class TemplateTest(BaseTest):
         """
 
         self.logger.info('listing specific template with parameter: attr_format=single...')  # single: só attrs
-        res = self.getTemplateWithParameters(jwt, template_id3, "attr_format=single")
+        res = self.getTemplateWithParameters(jwt, template_ids[2], "attr_format=single")
         self.logger.debug('Template info: ' + str(res))
 
         """
@@ -408,27 +413,33 @@ class TemplateTest(BaseTest):
         """
 
         self.logger.info('listing specific template with parameter: attr_format=split...')  # split: só data_attrs
-        res = self.getTemplateWithParameters(jwt, template_id3, "attr_format=split")
+        res = self.getTemplateWithParameters(jwt, template_ids[2], "attr_format=split")
         self.logger.debug('Template info: ' + str(res))
 
         """
         Remove template especifico
         """
-        template_id = 2  ##precisa criar um device desse template
-        self.logger.info('removing specific template - Templates cannot be removed as they are being used by devices...')
-        res = self.deleteTemplate(jwt, template_id)
-        self.logger.info('Result: ' + str(res))
 
         self.logger.info('removing specific template...')
-        template_id = 17 ##template Vazio, se o Sanity foi executado antes
-        res = self.deleteTemplate(jwt, template_id)
+        ##template Vazio
+        res = self.deleteTemplate(jwt, template_ids[4])
+        self.logger.debug('Result: ' + str(res))
+
+        devices = []
+        devices.append(([template_ids[2]], "device"))
+        devices_ids = self.createDevices(jwt, devices)
+        self.logger.info("devices ids: " + str(devices_ids))
+
+        self.logger.info('removing specific template - Templates cannot be removed as they are being used by devices...')
+        res = self.deleteTemplate(jwt, template_ids[2])
         self.logger.info('Result: ' + str(res))
+
 
         """
         Remove all templates
         """
 
-        ##só remove se não existir devices
+        ##só remove se não existir devices associados
 
         Api.delete_devices(jwt)
 
@@ -516,6 +527,4 @@ class TemplateTest(BaseTest):
         template_id = 2
         res = self.deleteTemplate(jwt, template_id)
         self.logger.info('Result: ' + str(res))
-
-
 
