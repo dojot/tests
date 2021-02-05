@@ -117,7 +117,7 @@ class DojotAPI():
         return result_code, res["template"]["id"] if result_code==200 else res
 
     @staticmethod
-    def create_device(jwt: str, template_id: str, label: str) -> str:
+    def create_device(jwt: str, template_id: str, label: str) -> tuple:
         """
         Create a device in Dojot.
 
@@ -149,7 +149,7 @@ class DojotAPI():
         result_code, res = DojotAPI.call_api(requests.post, args)
 
         LOGGER.debug("... device created ")
-        return result_code, res["devices"][0]["id"] if result_code == 200 else res
+        return result_code, res
 
     @staticmethod
     def create_flow(jwt: str, flow: str) -> str:
@@ -536,41 +536,6 @@ class DojotAPI():
         return res
 
     @staticmethod
-    def create_single_device(jwt: str, template_id: str, label: str) -> str:
-        """
-        Create a device in Dojot.
-
-        Parameters:
-            jwt: JWT authorization.
-            template_id: template to be used by the device.
-            label: name for the device in Dojot.
-
-        Returns the created device ID or a error message.
-        """
-        LOGGER.debug("Creating device...")
-
-        if type(template_id) != list:
-            template_id = [template_id]
-
-        args = {
-            "url": "{0}/device".format(CONFIG['dojot']['url']),
-            "headers": {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer {0}".format(jwt),
-            },
-            "data": json.dumps({
-                "templates": template_id,
-                "attrs": {},
-                "label": label,
-            }),
-        }
-
-        result_code, res = DojotAPI.call_api(requests.post, args)
-
-        LOGGER.debug("... device created ")
-        return result_code, res if result_code == 200 else res
-
-    @staticmethod
     def create_multiple_devices(jwt: str, template_id: str, label: str, attrs: str) -> str:
         """
         Create a device in Dojot.
@@ -670,7 +635,7 @@ class DojotAPI():
         LOGGER.debug("Retrieving devices...")
 
         args = {
-            "url": "{0}/device?{1}".format(CONFIG['dojot']['url'], attrs),
+            "url": "{0}/device{1}".format(CONFIG['dojot']['url'], attrs),
             "headers": {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer {0}".format(jwt),

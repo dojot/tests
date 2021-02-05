@@ -16,35 +16,20 @@ class DeviceTest(BaseTest):
             template_ids.append(template_id) if rc == 200 else template_ids.append(None)
         return template_ids
 
+
     def createDevices(self, jwt: str, devices: list):
-        device_ids = []
+        result = []
 
         for templates, label in devices:
             self.logger.info('adding device ' + label + ' using templates ' + str(templates))
-            rc, device_id = Api.create_device(jwt, templates, label)
-            self.assertTrue(device_id is not None, "Error on create device")
-            device_ids.append(device_id) if rc == 200 else device_ids.append(None)
+            rc, res = Api.create_device(jwt, templates, label)
+            #self.assertTrue(rc == 200, "Error on create device")
+            device_id = None
+            if rc == 200:
+                device_id = res["devices"][0]["id"]
+            result.append((rc, res, device_id))
+        return result
 
-        return device_ids
-
-
-    def createSingleDevice(self, jwt: str, template_id: int, label: str):
-        device_ids = []
-
-        #for templates, label in devices:
-        #self.logger.info('adding device ' + label + ' using templates ' + str(templates))
-        rc, res = Api.create_single_device(jwt, template_id, label)
-        #self.assertTrue(device_id is not None, "Error on create device")
-        #device_ids.append(device_id) if rc == 200 else device_ids.append(None)
-
-        return rc, res if rc==200 else res
-
-
-    def createDeviceFail(self, jwt: str, template_id: int, label: str):
-        rc, res = Api.create_device(jwt, template_id, label)
-
-        # return rc, res if rc != 200 else res
-        return res
 
     def createMultipleDevices(self, jwt: str, template_id: int, label: str, attrs: str):
         rc, res = Api.create_multiple_devices(jwt, template_id, label, attrs)
@@ -166,6 +151,16 @@ class DeviceTest(BaseTest):
                 }
                 ]
         })
+        templates.append({
+            "label": "Temperature",
+            "attrs": [
+                {
+                    "label": "temperature",
+                    "type": "dynamic",
+                    "value_type": "float"
+                }
+                ]
+        })
 
         template_ids = self.createTemplates(jwt, templates)
         self.logger.info("templates ids: " + str(template_ids))
@@ -181,12 +176,8 @@ class DeviceTest(BaseTest):
 
         self.logger.info('listing device - by ID...')
         list = self.getDevice(jwt, Api.get_deviceid_by_label(jwt, 'dispositivo'))
-        self.logger.info('Device info: ' + str(list))
+        self.logger.debug('Device info: ' + str(list))
 
-
-        self.logger.info('listing device - by label...')
-        list = self.getDevice(jwt, Api.get_deviceid_by_label(jwt, "dispositivo"))
-        self.logger.info('Device info: ' + str(list))
 
         """
           
@@ -235,86 +226,105 @@ class DeviceTest(BaseTest):
         list = self.getDevices(jwt)
         self.logger.debug('Device List: ' + str(list))
 
-        self.logger.info('listing devices with parameter: page_size...')
-        res = self.getDevicesWithParameters(jwt, "page_size=3")
+        self.logger.info('listing devices with parameter: page_size=4...')
+        res = self.getDevicesWithParameters(jwt, "?page_size=4")
         self.logger.debug('Devices: ' + str(res))
 
-        self.logger.info('listing devices with parameter: page_num...')
-        res = self.getDevicesWithParameters(jwt, "page_num=2")
+        self.logger.info('listing devices with parameter: page_num=2...')
+        res = self.getDevicesWithParameters(jwt, "?page_num=2")
         self.logger.debug('Devices: ' + str(res))
 
-        self.logger.info('listing devices with parameter: page_size=2&page_num=1...')
-        res = self.getDevicesWithParameters(jwt, "page_size=2&page_num=1")
+        self.logger.info('listing devices with parameter: page_size=3&page_num=1...')
+        res = self.getDevicesWithParameters(jwt, "?page_size=3&page_num=1")
         self.logger.debug('Devices: ' + str(res))
 
-        self.logger.info('listing devices with parameter: page_size=2&page_num=2...')
-        res = self.getDevicesWithParameters(jwt, "page_size=2&page_num=2")
+        self.logger.info('listing devices with parameter: page_size=3&page_num=2...')
+        res = self.getDevicesWithParameters(jwt, "?page_size=3&page_num=2")
         self.logger.debug('Devices: ' + str(res))
 
-        self.logger.info('listing devices with parameter: page_size=2&page_num=3...')
-        res = self.getDevicesWithParameters(jwt, "page_size=2&page_num=3")
+        self.logger.info('listing devices with parameter: page_size=3&page_num=3...')
+        res = self.getDevicesWithParameters(jwt, "?page_size=3&page_num=3")
         self.logger.debug('Devices: ' + str(res))
 
-        self.logger.info('listing devices with parameter: page_size=2&page_num=4...')
-        res = self.getDevicesWithParameters(jwt, "page_size=2&page_num=4")
+        self.logger.info('listing devices with parameter: page_size=3&page_num=4...')
+        res = self.getDevicesWithParameters(jwt, "?page_size=3&page_num=4")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: idsOnly=true...')
-        res = self.getDevicesWithParameters(jwt, "idsOnly=true")
-        self.logger.info('Devices: ' + str(res))
+        res = self.getDevicesWithParameters(jwt, "?idsOnly=true")
+        self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: idsOnly=false...')
-        res = self.getDevicesWithParameters(jwt, "idsOnly=false")
+        res = self.getDevicesWithParameters(jwt, "?idsOnly=false")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: attr...')  # só é válido para atributos estáticos
-        res = self.getDevicesWithParameters(jwt, "attr=serial=indefinido")
+        res = self.getDevicesWithParameters(jwt, "?attr=serial=indefinido")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: label...')
-        res = self.getDevicesWithParameters(jwt, "label=test_device")
+        res = self.getDevicesWithParameters(jwt, "?label=test_device")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: sortBy...')
-        res = self.getDevicesWithParameters(jwt, "sortBy=label")
+        res = self.getDevicesWithParameters(jwt, "?sortBy=label")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: attr_type=integer...')
-        res = self.getDevicesWithParameters(jwt, "attr_type=integer")
+        res = self.getDevicesWithParameters(jwt, "?attr_type=integer")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: attr_type=float...')
-        res = self.getDevicesWithParameters(jwt, "attr_type=float")
+        res = self.getDevicesWithParameters(jwt, "?attr_type=float")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: attr_type=string...')
-        res = self.getDevicesWithParameters(jwt, "attr_type=string")
+        res = self.getDevicesWithParameters(jwt, "?attr_type=string")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: attr_type=bool...')
-        res = self.getDevicesWithParameters(jwt, "attr_type=bool")
+        res = self.getDevicesWithParameters(jwt, "?attr_type=bool")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: attr_type=geo:point...')
-        res = self.getDevicesWithParameters(jwt, "attr_type=geo:point")
+        res = self.getDevicesWithParameters(jwt, "?attr_type=geo:point")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameter: attr_type=object...')
-        res = self.getDevicesWithParameters(jwt, "attr_type=object")
+        res = self.getDevicesWithParameters(jwt, "?attr_type=object")
         self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with all parameters...')
-        res = self.getDevicesWithParameters(jwt, "page_size=2&page_num=1&idsOnly=true&attr_type=string&attr=serial=indefinido&label=dispositivo&sortBy=label")
-        self.logger.info('Devices: ' + str(res))
+        res = self.getDevicesWithParameters(jwt, "?page_size=2&page_num=1&idsOnly=true&attr_type=string&attr=serial=indefinido&label=dispositivo&sortBy=label")
+        self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameters (no match): return empty...')
         res = self.getDevicesWithParameters(jwt,
-                                            "page_size=2&page_num=1&idsOnly=false&attr_type=string&attr=serial=undefined&label=device&sortBy=label")
-        self.logger.info('Devices: ' + str(res))
+                                            "?page_size=2&page_num=1&idsOnly=false&attr_type=string&attr=serial=undefined&label=device&sortBy=label")
+        self.logger.debug('Devices: ' + str(res))
 
         self.logger.info('listing devices with parameters (nonexistent parameter ): return full...')
-        res = self.getDevicesWithParameters(jwt, "parametro=outro")
+        res = self.getDevicesWithParameters(jwt, "?parametro=outro")
         self.logger.debug('Devices: ' + str(res))
+
+        self.logger.info('listing devices associated with given template...')
+        res = self.getDevicesWithParameters(jwt, "/template/1")
+        self.logger.debug('Result: ' + str(res))
+
+        self.logger.info('listing devices associated with given template - page_num...')
+        res = self.getDevicesWithParameters(jwt, "/template/1?page_num=1")
+        self.logger.debug('Result: ' + str(res))
+
+        self.logger.info('listing devices associated with given template - page_size...')
+        res = self.getDevicesWithParameters(jwt, "/template/1?page_size=2")
+        self.logger.debug('Result: ' + str(res))
+
+        self.logger.info('listing devices associated with given template - page_num e page_size...')
+        res = self.getDevicesWithParameters(jwt, "/template/1?page_size=2&page_num=2")
+        self.logger.debug('Result: ' + str(res))
+
+
+
 
         """
         Lista device especifico
@@ -325,7 +335,7 @@ class DeviceTest(BaseTest):
         self.logger.debug('Device info: ' + str(res))
 
         self.logger.info('listing specific device - label...')
-        res = self.getDevice(jwt, '?label=dispositivo')
+        res = self.getDevicesWithParameters(jwt, '?label=dispositivo')
         self.logger.debug('Device info: ' + str(res))
 
         """
@@ -355,7 +365,20 @@ class DeviceTest(BaseTest):
         """
         Fluxos Alternativos
         """
-        self.logger.info('creating devices with count & verbose ...')
+
+        """
+        POST
+        """
+
+        self.logger.info('creating device - No such template...')
+
+        devices = []
+        devices.append(("1000", "teste"))
+        result = self.createDevices(jwt, devices)
+        self.logger.info("Result: " + str(result))
+
+
+        self.logger.info('creating devices with count & verbose ...- Verbose can only be used for single device creation')
         result = self.createMultipleDevices(jwt, template_ids[1], 'test', "count=3&verbose=true")
         self.logger.info('Result: ' + str(result))
 
@@ -369,39 +392,83 @@ class DeviceTest(BaseTest):
 
         #TODO:  'a device can not have repeated attributes' (device tem 2 atributos iguais de templates diferentes)
 
-        self.logger.info('creating device - No such template...')
-        result = self.createSingleDevice(jwt, 1000, 'dispositivo')
-        self.logger.info('Result: ' + str(result))
-
         #TODO: 'Failed to generate unique device_id' (é erro interno)
+
+        """
+        GET
+        """
 
         self.logger.info('listing device - No such device...')
         res = self.getDevice(jwt, "123")
         self.logger.info('Result: ' + str(res))
 
         self.logger.info('listing device - internal error...')
-        res = self.getDevice(jwt, "abc")
+        res = self.getDevicesWithParameters(jwt, "?page_num=")
         self.logger.info('Result: ' + str(res))
 
-        self.logger.info('removing specific device - No such device...')
-        device_id = 2
-        res = self.deleteDevice(jwt, '123')
+        self.logger.info('listing devices with parameter: Page numbers must be greater than 1...')
+        res = self.getDevicesWithParameters(jwt, "?page_num=0")
         self.logger.info('Result: ' + str(res))
 
-        """
-        self.logger.info('updating specific device - No such device...')
-        res = self.updateDevice(jwt, device_id, template)
-        self.logger.info('Result: ' + str(res))
-        """
-
-        self.logger.info('listing devices with parameter: page_num=0...')
-        res = self.getDevicesWithParameters(jwt, "page_num=0")
-        self.logger.info('Result: ' + str(res))
-
-        self.logger.info('listing devices with parameter: page_size=0...')
-        res = self.getDevicesWithParameters(jwt, "page_size=0")
+        self.logger.info('listing devices with parameter: At least one entry per page is mandatory...')
+        res = self.getDevicesWithParameters(jwt, "?page_size=0")
         self.logger.info('Result: ' + str(res))
 
         self.logger.info('listing devices with parameter: page_size and page_num must be integers...')
-        res = self.getDevicesWithParameters(jwt, "page_num=xyz&page_size=kwv")
+        res = self.getDevicesWithParameters(jwt, "?page_num=xyz&page_size=kwv")
+        self.logger.info('Result: ' + str(res))
+
+        """
+        GET - list of devices associated with given template
+        GET/device/template/{template_id}{?page_size,page_num}
+        """
+        self.logger.info('listing devices associated with given template - At least one entry per page is mandatory...')
+        res = self.getDevicesWithParameters(jwt, "/template/1?page_size=0")
+        self.logger.info('Result: ' + str(res))
+
+        self.logger.info('listing devices associated with given template - Page numbers must be greater than 1...')
+        res = self.getDevicesWithParameters(jwt, "/template/1?page_num=0")
+        self.logger.info('Result: ' + str(res))
+
+        self.logger.info('listing devices associated with given template - page_size and page_num must be integers...')
+        res = self.getDevicesWithParameters(jwt, "/template/1?page_num=kwv&page_size=xyz")
+        self.logger.info('Result: ' + str(res))
+
+
+        """
+        PUT  /device/{id}
+        """
+
+        # TODO: 'updating device - Payload must be valid JSON, and Content-Type set accordingly'
+
+        # TODO: 'updating device - Missing data for required field.'
+
+        # TODO: 'updating device - a device can not have repeated attributes'
+
+        # TODO: 'updating device - No such device: aaaa'
+
+        # TODO: 'updating specific device - No such device...'
+
+        # TODO: 'updating device - No such template: 4685'
+
+        # TODO: 'updating device - Unknown template 4865 in attr list'
+
+        # TODO: 'updating device - Unknown attribute 2 in override list'
+
+        # TODO: 'updating device - Unknown metadata attribute 2 in override list'
+
+        """
+        Configure device - PUT /device/{id}/actuate
+        """
+
+        # TODO: 'updating device - No such device: aaaa'
+
+        # TODO: 'updating device - some of the attributes are not configurable'
+
+        """
+        DELETE
+        """
+
+        self.logger.info('removing specific device - No such device...')
+        res = self.deleteDevice(jwt, '123')
         self.logger.info('Result: ' + str(res))
