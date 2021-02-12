@@ -11,9 +11,8 @@ class DeviceTest(BaseTest):
         template_ids = []
         for template in templates:
             rc, template_id = Api.create_template(jwt, json.dumps(template))
-            self.assertTrue(isinstance(template_id, int), "Error on create template")
 
-            template_ids.append(template_id) if rc == 200 else template_ids.append(None)
+            template_ids.append(template_id["template"]["id"]) if rc == 200 else template_ids.append(None)
         return template_ids
 
 
@@ -48,7 +47,7 @@ class DeviceTest(BaseTest):
         return res
 
     def getDevicesWithParameters(self, jwt: str, attrs: str):
-        res = Api.get_devices_with_parameters(jwt, attrs)
+        _, res = Api.get_devices_with_parameters(jwt, attrs)
         # self.assertTrue(isinstance(device_id, int), "Error on get devices")
         return res
 
@@ -58,7 +57,7 @@ class DeviceTest(BaseTest):
         return res
 
     def deleteDevices(self, jwt: str):
-        res = Api.delete_devices(jwt)
+        _, res = Api.delete_devices(jwt)
         # self.assertTrue(isinstance(device_id, int), "Error on delete template")
         return res
 
