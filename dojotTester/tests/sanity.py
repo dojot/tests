@@ -55,6 +55,14 @@ class SanityTest(BaseTest):
 
         return flows_ids
 
+    def createUsers(self, jwt: str, user: str):
+
+        Api.create_user(jwt, user)
+
+
+
+
+
     def runTest(self):
         self.logger.info('Executing sanity test')
         self.logger.debug('getting jwt...')
@@ -2626,6 +2634,7 @@ class SanityTest(BaseTest):
 
         self.logger.info("Flows created. IDs: " + str(flows_ids))
 
+
         group1 = {"name": "viewer" + str(random.randint(0, 100)),
                   "description": "Grupo com acesso somente para visualizar as informações"}
         group1_id = Api.create_group(jwt, group1)
@@ -2638,14 +2647,15 @@ class SanityTest(BaseTest):
 
         # adicionar usuario
 
-        user1 = {
-            "username": "bete",
+        user1 = {"username": "bete",
             "service": "teste",
             "email": "bete@noemail.com",
             "name": "Elisabete",
             "profile": "admin"
             }
-        Api.create_user(jwt, user1)
+        self.createUsers(jwt, user1)
+        self.logger.info("User created: bete")
+
 
         user2 = {
             "username": "maria",
@@ -2654,7 +2664,9 @@ class SanityTest(BaseTest):
             "name": "Maria",
             "profile": "admin"
             }
-        Api.create_user(jwt, user2)
+        self.createUsers(jwt, user2)
+        self.logger.info("User created: maria")
+
 
         #TODO listar tenants
 
@@ -2679,12 +2691,13 @@ class SanityTest(BaseTest):
 
         ## TODO: obter histórico do dev1_id
 
-        # curl -X GET "${DOJOT_HOST}/history/device/${id_device}/history?lastN=3" -H "Authorization: Bearer ${JWT}" -H "Content-Type:application/json" 2>/dev/null
+        Api.get_history_device(jwt,dev1_id)
 
         time.sleep(1)
 
         ## TODO: obter histórico do dev2_id
-        # curl -X GET "${DOJOT_HOST}/history/device/${id_device2}/history?lastN=3" -H "Authorization: Bearer ${JWT}" -H "Content-Type:application/json" 2>/dev/null
+
+        Api.get_history_device(jwt,dev2_id)
 
         time.sleep(1)
 
