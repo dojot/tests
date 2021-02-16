@@ -3,6 +3,7 @@ Utils functions.
 """
 import logging
 import os
+from config import CONFIG
 
 
 
@@ -104,6 +105,6 @@ class Utils():
         )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        logger.setLevel(Utils.log_level(os.environ.get("LOG_LEVEL", "info")))
+        logger.setLevel(Utils.log_level(CONFIG['log']['level']))
 
         return logger

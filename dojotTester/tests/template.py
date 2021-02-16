@@ -21,9 +21,9 @@ class TemplateTest(BaseTest):
         template_ids = []
         for template in templates:
             rc, template_id = Api.create_template(jwt, json.dumps(template))
-            self.assertTrue(isinstance(template_id, int), "Error on create template")
+            #self.assertTrue(isinstance(template_id, int), "Error on create template")
 
-            template_ids.append(template_id) if rc == 200 else template_ids.append(None)
+            template_ids.append(template_id["template"]["id"]) if rc == 200 else template_ids.append(None)
         return template_ids
 
     def createDevices(self, jwt: str, devices: list):
@@ -46,25 +46,25 @@ class TemplateTest(BaseTest):
     def updateTemplate(self, jwt: str, tempĺate_id: int, template: str):
         rc, res = Api.update_template(jwt, tempĺate_id, json.dumps(template))
         #self.assertTrue(isinstance(template_id, int), "Error on update template")
-        return res if rc == 200 else res
+        return res
 
     def getTemplates(self, jwt: str):
-        res = Api.get_templates(jwt)
+        _, res = Api.get_templates(jwt)
         #self.assertTrue(isinstance(template_id, int), "Error on get template")
         return res
 
     def getTemplatesWithParameters(self, jwt: str, attrs: str):
-        res = Api.get_templates_with_parameters(jwt, attrs)
+        _, res = Api.get_templates_with_parameters(jwt, attrs)
         # self.assertTrue(isinstance(template_id, int), "Error on get template")
         return res
 
     def getTemplate(self, jwt: str, template_id: int):
-        res = Api.get_template(jwt, template_id)
+        _, res = Api.get_template(jwt, template_id)
         #self.assertTrue(isinstance(template_id, int), "Error on get template")
         return res
 
     def getTemplateWithParameters(self, jwt: str, template_id: int, attrs: str):
-        res = Api.get_template_with_parameters(jwt, template_id, attrs)
+        _, res = Api.get_template_with_parameters(jwt, template_id, attrs)
         # self.assertTrue(isinstance(template_id, int), "Error on get template")
         return res
 

@@ -28,9 +28,8 @@ class SanityTest(BaseTest):
         template_ids = []
         for template in templates:
             rc, template_id = Api.create_template(jwt, json.dumps(template))
-            self.assertTrue(isinstance(template_id, int), "Error on create template")
 
-            template_ids.append(template_id) if rc == 200 else template_ids.append(None)
+            template_ids.append(template_id["template"]["id"]) if rc == 200 else template_ids.append(None)
         return template_ids
 
     def createDevices(self, jwt: str, devices: list):
@@ -51,7 +50,7 @@ class SanityTest(BaseTest):
             self.logger.info('adding flow..')
             rc, flow_id = Api.create_flow(jwt, flow)
             self.assertTrue(flow_id is not None, "Error on create flow")
-            flows_ids.append(flow_id) if rc == 200 else flows_ids.append(None)
+            flows_ids.append(flow_id["flow"]["id"]) if rc == 200 else flows_ids.append(None)
 
         return flows_ids
 
@@ -2637,7 +2636,10 @@ class SanityTest(BaseTest):
 
         group1 = {"name": "viewer" + str(random.randint(0, 100)),
                   "description": "Grupo com acesso somente para visualizar as informações"}
-        group1_id = Api.create_group(jwt, group1)
+        rc, response = Api.create_group(jwt, group1)
+        self.logger.debug(f"Group group1 creation return the result code: {rc} and response: {response}")
+        self.assertTrue(int(rc) == 200, "Error on create group")
+        group1_id = response["id"]
 
         self.logger.info("Groups created. IDs: " + str(group1_id))
 
