@@ -2637,13 +2637,25 @@ class SanityTest(BaseTest):
 
         group1 = {"name": "viewer" + str(random.randint(0, 100)),
                   "description": "Grupo com acesso somente para visualizar as informações"}
-        group1_id = Api.create_group(jwt, group1)
-
+        rc, res = Api.create_group(jwt, group1)
+        group1_id = res["id"]
         self.logger.info("Groups created. IDs: " + str(group1_id))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         #TODO adicionar as permissoes ao grupo
 
-        Api.add_permission(jwt, group1_id, "2")
+        rc, res = Api.add_permission(jwt, group1_id, "2")
+        self.logger.info("Permissions added to the group: " + str(group1_id))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
+
+        rc, res = Api.add_permission(jwt, group1_id, "4")
+        self.logger.info("Permissions added to the group: " + str(group1_id))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
+
+        rc, res = Api.add_permission(jwt, group1_id, "6")
+        self.logger.info("Permissions added to the group: " + str(group1_id))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
+
 
         # adicionar usuario
 
