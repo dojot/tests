@@ -11,9 +11,8 @@ class DeviceTest(BaseTest):
         template_ids = []
         for template in templates:
             rc, template_id = Api.create_template(jwt, json.dumps(template))
-            self.assertTrue(isinstance(template_id, int), "Error on create template")
 
-            template_ids.append(template_id) if rc == 200 else template_ids.append(None)
+            template_ids.append(template_id["template"]["id"]) if rc == 200 else template_ids.append(None)
         return template_ids
 
 
@@ -163,7 +162,7 @@ class DeviceTest(BaseTest):
         })
 
         template_ids = self.createTemplates(jwt, templates)
-        self.logger.debug("templates ids: " + str(template_ids))
+        self.logger.info("templates ids: " + str(template_ids))
 
         devices = []
         devices.append(([template_ids[0]], "dispositivo"))
@@ -393,7 +392,7 @@ class DeviceTest(BaseTest):
 
         """
         self.logger.info('removing all devices...')
-        rc, res = self.deleteDevices(jwt)
+        res = self.deleteDevices(jwt)
         self.logger.debug('Result: ' + str(res))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
         """

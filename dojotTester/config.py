@@ -31,4 +31,7 @@ CONFIG = {
             'page_size': int(os.environ.get("DOJOT_DEVICES_PAGE_SIZE", 20))
         }
     },
+    'log': {
+        'level': os.environ.get("LOG_LEVEL", "info")
+    }
 }

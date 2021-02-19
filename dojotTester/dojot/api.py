@@ -77,10 +77,11 @@ class DojotAPI():
             args["url"] = "{0}/device?count={1}&verbose=false".format(CONFIG['dojot']['url'], load)
 
             DojotAPI.call_api(requests.post, args)
-            LOGGER.debug("... created the devices")
+
+        LOGGER.debug("... created the devices")
 
     @staticmethod
-    def create_template(jwt: str, data=None) -> str:
+    def create_template(jwt: str or dict, data=None) -> tuple:
         """
         Create the default template for test devices.
 
@@ -113,7 +114,7 @@ class DojotAPI():
         result_code, res = DojotAPI.call_api(requests.post, args)
 
         LOGGER.debug("... created the template")
-        return result_code, res["template"]["id"] if result_code==200 else res
+        return result_code, res
 
     @staticmethod
     def create_device(jwt: str, template_id: str or list, label: str) -> tuple:
@@ -211,7 +212,7 @@ class DojotAPI():
         return result_code, res
 
     @staticmethod
-    def add_permission(jwt: str, group: str, permission: str or list) -> tuple:
+    def add_permission(jwt: str, group: str, permission: str) -> str:
         """
         Add permission a group in Dojot.
 
@@ -273,6 +274,7 @@ class DojotAPI():
 
         Parameters:
             jwt: Dojot JWT token
+            label: Dojot device label
 
         Returns device ID or None.
         """
@@ -325,7 +327,6 @@ class DojotAPI():
         """
         Delete all devices.
         """
-        # FIXME
         LOGGER.debug("Deleting devices...")
 
         args = {
@@ -346,7 +347,6 @@ class DojotAPI():
         """
         Delete device.
         """
-        # FIXME
         LOGGER.debug("Deleting device...")
 
         args = {
@@ -366,7 +366,6 @@ class DojotAPI():
         """
         Delete all templates.
         """
-        # FIXME
         LOGGER.debug("Deleting templates...")
 
         args = {
@@ -413,7 +412,6 @@ class DojotAPI():
 
         Returns a list of IDs.
         """
-
         LOGGER.debug("Retrieving devices...")
 
         args = {
@@ -511,7 +509,7 @@ class DojotAPI():
         return rc, res
 
     @staticmethod
-    def get_template_with_parameters(jwt: str, template_id: int, attrs: str) -> str:
+    def get_template_with_parameters(jwt: str, template_id: int, attrs: str) -> tuple:
         """
         Retrieves template info.
 
@@ -530,11 +528,11 @@ class DojotAPI():
             }
         }
 
-        res = DojotAPI.call_api(requests.get, args)
+        rc, res = DojotAPI.call_api(requests.get, args)
 
         LOGGER.debug("... retrieved template")
 
-        return res
+        return rc, res
 
     @staticmethod
     def create_multiple_devices(jwt: str, template_id: str or list, label: str, attrs: str) -> tuple:
@@ -599,7 +597,7 @@ class DojotAPI():
 
 
     @staticmethod
-    def get_single_device(jwt: str, device_id: str) -> str:
+    def get_single_device(jwt: str, device_id: str) -> tuple:
         """
         Retrieves a device in Dojot.
 
@@ -621,10 +619,10 @@ class DojotAPI():
         result_code, res = DojotAPI.call_api(requests.get, args)
 
         LOGGER.debug("... device retrieved ")
-        return result_code, res if result_code == 200 else res
+        return result_code, res
 
     @staticmethod
-    def get_devices_with_parameters(jwt: str, attrs: str) -> str:
+    def get_devices_with_parameters(jwt: str, attrs: str) -> tuple:
         """
         Retrieves all templates.
 
@@ -643,15 +641,15 @@ class DojotAPI():
             }
         }
 
-        res = DojotAPI.call_api(requests.get, args)
+        rc, res = DojotAPI.call_api(requests.get, args)
 
         LOGGER.debug("...devices retrieved")
 
-        return res
+        return rc, res
 
 
     @staticmethod
-    def update_device(jwt: str, label: str, data: str) -> str:
+    def update_device(jwt: str, label: str, data: str or dict) -> tuple:
         """
 
         Returns the updated template ID or a error message.
@@ -672,16 +670,17 @@ class DojotAPI():
         result_code, res = DojotAPI.call_api(requests.put, args)
 
         LOGGER.debug("... updated the template")
-        return result_code, res if result_code==200 else res
+        return result_code, res
 
 
     @staticmethod
-    def get_history_device(jwt: str, label: str) -> str:
+    def get_history_device(jwt: str, label: str) -> tuple:
         """
         Retrieves device attributes data from Dojot.
 
         Parameters:
             jwt: Dojot JWT token
+            label: Dojot device label
 
             """
         LOGGER.debug("Retrieving history...")
@@ -694,11 +693,11 @@ class DojotAPI():
             }
         }
 
-        res = DojotAPI.call_api(requests.get, args)
+        rc, res = DojotAPI.call_api(requests.get, args)
 
         LOGGER.debug("... retrieved history")
 
-        return res
+        return rc, res
 
 
     @staticmethod
@@ -706,7 +705,6 @@ class DojotAPI():
         """
         Divides `n` in a list with each element being up to `batch`.
         """
-        # FIXME
         loads = []
 
         if total > batch:

@@ -23,7 +23,7 @@ class TemplateTest(BaseTest):
             rc, template_id = Api.create_template(jwt, json.dumps(template))
             #self.assertTrue(isinstance(template_id, int), "Error on create template")
 
-            template_ids.append(template_id) if rc == 200 else template_ids.append(None)
+            template_ids.append(template_id["template"]["id"]) if rc == 200 else template_ids.append(None)
         return template_ids
 
     def createDevices(self, jwt: str, devices: list):
