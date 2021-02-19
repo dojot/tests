@@ -467,11 +467,13 @@ class TemplateTest(BaseTest):
         ##só remove se não existir devices associados
 
         Api.delete_devices(jwt)
+        """
 
         self.logger.info('removing all templates...')
         rc, res = self.deleteTemplates(jwt)
         self.logger.debug('Result: ' + str(res))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
+        """
 
 
         """
@@ -524,8 +526,7 @@ class TemplateTest(BaseTest):
                 }
             ]
         }
-        template_id = 2
-        rc, res = self.updateTemplate(jwt, template_id, template)
+        rc, res = self.updateTemplate(jwt, 1000, template)
         self.logger.info('Result: ' + str(res))
         self.assertTrue(int(rc) == 404, "codigo inesperado")
 
@@ -555,8 +556,7 @@ class TemplateTest(BaseTest):
         self.assertTrue(int(rc) == 500, "codigo inesperado")
 
         self.logger.info('removing specific template - No such template...')
-        template_id = 2
-        rc, res = self.deleteTemplate(jwt, template_id)
+        rc, res = self.deleteTemplate(jwt, 1000)
         self.logger.info('Result: ' + str(res))
         self.assertTrue(int(rc) == 404, "codigo inesperado")
 
