@@ -30,8 +30,8 @@ class DeviceTest(BaseTest):
         return result
 
 
-    def createMultipleDevices(self, jwt: str, template_id: int, label: str, attrs: str):
-        rc, res = Api.create_multiple_devices(jwt, template_id, label, attrs)
+    def createDevicesWithParameters(self, jwt: str, template_id: int, label: str, attrs: str):
+        rc, res = Api.create_devices_with_parameters(jwt, template_id, label, attrs)
 
         # return rc, res if rc != 200 else res
         return rc, res
@@ -64,6 +64,11 @@ class DeviceTest(BaseTest):
     def deleteDevice(self, jwt: str, device_id: str):
         rc, res = Api.delete_device(jwt, device_id)
         # self.assertTrue(isinstance(device_id, int), "Error on delete template")
+        return rc, res
+
+    def configureDevice(self, jwt: str, device_id: str, template: str or dict):
+        rc, res = Api.configure_device(jwt, device_id, json.dumps(template))
+        # self.assertTrue(isinstance(device_id, int), "Error on configure device")
         return rc, res
 
     def runTest(self):
@@ -172,13 +177,14 @@ class DeviceTest(BaseTest):
         devices_ids = self.createDevices(jwt, devices)
         self.logger.info("devices ids: " + str(devices_ids))
 
-        #TODO: 'listing device - by ID...'
-
-
         self.logger.info('listing device - by ID...')
         rc, list = self.getDevice(jwt, Api.get_deviceid_by_label(jwt, 'sensor2'))
         self.logger.info('Device info: ' + str(list))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
+
+        """
+        Update device
+        """
 
         self.logger.info('updating device sensor2: change of label and template......')
         template = {
@@ -243,30 +249,46 @@ class DeviceTest(BaseTest):
         self.logger.info('Device info: ' + str(list))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
-
-
-
         """
         Create multiple devices
         """
 
         self.logger.info('creating multiple devices...')
-        rc, device_list = self.createMultipleDevices(jwt, template_ids[1], 'test_device', "count=5")
+        rc, device_list = self.createDevicesWithParameters(jwt, template_ids[1], 'test_device', "count=5")
         self.logger.info('Devices created: ' + str(device_list))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('creating devices with verbose=False ...')
-        rc, device_list = self.createMultipleDevices(jwt, template_ids[1], 'test_verbose_false', "verbose=False")
+        rc, device_list = self.createDevicesWithParameters(jwt, template_ids[1], 'test_verbose_false', "verbose=False")
         self.logger.info('Device created: ' + str(device_list))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('creating devices with verbose=True ...')
-        rc, device_list = self.createMultipleDevices(jwt, template_ids[1], 'test_verbose_true', "verbose=True")
+        rc, device_list = self.createDevicesWithParameters(jwt, template_ids[1], 'test_verbose_true', "verbose=True")
         self.logger.info('Device created: ' + str(device_list))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         """
-        #Lista devices
+        Configure device - PUT /device/{id}/actuate
+        """
+
+        self.logger.info('configuring device: configuration sent to device......')
+        template = {
+            "attrs": {
+                "mensagem": "atuando no device"
+            }
+        }
+
+        device_id = Api.get_deviceid_by_label(jwt, 'dispositivo2')
+        self.logger.info('device_id: ' + device_id)
+
+        rc, res = self.configureDevice(jwt, device_id, template)
+        self.logger.debug('Result: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
+
+
+        """
+        Lista devices
         """
 
         self.logger.info('listing all devices...')
@@ -395,9 +417,6 @@ class DeviceTest(BaseTest):
         self.logger.info('Result: ' + str(res))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
-
-
-
         """
         Lista device especifico
         """
@@ -452,18 +471,19 @@ class DeviceTest(BaseTest):
         self.assertTrue(int(result[0][0]) == 404, "codigo inesperado")
 
         self.logger.info('creating devices with count & verbose ...- Verbose can only be used for single device creation')
-        rc, result = self.createMultipleDevices(jwt, template_ids[1], 'test', "count=3&verbose=true")
+        rc, result = self.createDevicesWithParameters(jwt, template_ids[1], 'test', "count=3&verbose=true")
         self.logger.info('Result: ' + str(result))
         self.assertTrue(int(rc) == 400, "codigo inesperado")
 
         self.logger.info('creating devices - count must be integer ...')
-        rc, result = self.createMultipleDevices(jwt, template_ids[1], 'test', "count=true")
+        rc, result = self.createDevicesWithParameters(jwt, template_ids[1], 'test', "count=true")
         self.logger.info('Result: ' + str(result))
         self.assertTrue(int(rc) == 400, "codigo inesperado")
 
         #TODO: 'creating devices - Payload must be valid JSON...' (tem como provocar o erro?) ex: {"templates", "label": "dev"}
 
         #TODO: 'creating devices - Missing data for required field ...' ex: {"template": [1]}
+
 
         #'a device can not have repeated attributes' (device tem 2 atributos iguais de templates diferentes)
         devices = []
@@ -582,7 +602,7 @@ class DeviceTest(BaseTest):
 
         template = {
             "label": "teste_device_0",
-            "templates": [1, 2, 4685]
+            "templates": [1, 2, 4732]
         }
 
         device_id = Api.get_deviceid_by_label(jwt, 'test_device_0')
@@ -624,9 +644,29 @@ class DeviceTest(BaseTest):
         Configure device - PUT /device/{id}/actuate
         """
 
-        # TODO: 'updating device - No such device: aaaa'
+        self.logger.info('configuring device: No such device: aaaa......')
+        template = {
+            "attrs": {
+                "mensagem": "NOK"
+            }
+        }
 
-        # TODO: 'updating device - some of the attributes are not configurable'
+        rc, res = self.configureDevice(jwt, 'aaaa', template)
+        self.logger.info('Result: ' + str(res))
+        self.assertTrue(int(rc) == 404, "codigo inesperado")
+
+        self.logger.info('configuring device: some of the attributes are not configurable......')
+        template = {
+            "attrs": {
+                "float": 1.5
+            }
+        }
+
+        device_id = Api.get_deviceid_by_label(jwt, 'dispositivo')
+
+        rc, res = self.configureDevice(jwt, device_id, template)
+        self.logger.info('Result: ' + str(res))
+        self.assertTrue(int(rc) == 403, "codigo inesperado")
 
         """
         DELETE
