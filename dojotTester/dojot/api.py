@@ -212,7 +212,7 @@ class DojotAPI():
         return result_code, res
 
     @staticmethod
-    def add_permission(jwt: str, group: str, permission: str) -> str:
+    def add_permission(jwt: str, group: str, permission: str) -> tuple:
         """
         Add permission a group in Dojot.
 
