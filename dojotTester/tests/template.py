@@ -288,7 +288,6 @@ class TemplateTest(BaseTest):
         template_ids = self.createTemplates(jwt, templates)
         self.logger.info("templates ids: " + str(template_ids))
 
-        """
         self.logger.debug('updating template SensorModel......')
         template = {
             "label": "SensorModel",
@@ -306,20 +305,20 @@ class TemplateTest(BaseTest):
             ]
         }
 
-        #template_id de 'SensorModel'
-        rc, res = self.updateTemplate(jwt, template_id2, template)
-        self.logger.info('Template updated: ' + str(template_id2) + ', SensorModel')
+
+        self.logger.debug('listing template SensorModel...')
+        rc, res = self.getTemplate(jwt, template_ids[2])
+        self.logger.debug('Template: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
+
+        rc, res = self.updateTemplate(jwt, template_ids[2], template)
+        self.logger.info('Template updated: ' + str(template_ids[2]) + ', SensorModel')
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.debug('listing updated template...')
-        list = self.getTemplate(jwt, template_id2)
-        self.logger.debug('Template: ' + str(list))
+        rc, res = self.getTemplate(jwt, template_ids[2])
+        self.logger.debug('Template: ' + str(res))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
-
-        """
-
-
-        #TODO: adicionar imagem (endpoints /image e /binary)
 
         """
         Lista templates
@@ -444,7 +443,7 @@ class TemplateTest(BaseTest):
 
         self.logger.info('removing specific template...')
         ##template Vazio
-        rc, res = self.deleteTemplate(jwt, template_ids[4])
+        rc, res = self.deleteTemplate(jwt, template_ids[1])
         self.logger.debug('Result: ' + str(res))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
