@@ -567,7 +567,7 @@ class DeviceTest(BaseTest):
         self.logger.info('updating device: a device can not have repeated attributes......')
         template = {
             "label": "test_device_1",
-            "templates": [2, 3]
+            "templates": [template_ids[1], template_ids[2]]
         }
 
         device_id = Api.get_deviceid_by_label(jwt, 'test_device_1')
@@ -579,7 +579,7 @@ class DeviceTest(BaseTest):
         self.logger.info('updating device: No such device: aaaa......')
         template = {
             "label": "teste_device_1",
-            "templates": [2, 3]
+            "templates": [template_ids[1]]
         }
 
         rc, res = self.updateDevice(jwt, 'aaaa', template)
@@ -602,7 +602,7 @@ class DeviceTest(BaseTest):
 
         template = {
             "label": "teste_device_0",
-            "templates": [1, 2, 4732]
+            "templates": [template_ids[1], template_ids[2], 4732]
         }
 
         device_id = Api.get_deviceid_by_label(jwt, 'test_device_0')
