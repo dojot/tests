@@ -76,9 +76,10 @@ class DeviceTest(BaseTest):
         self.logger.info('getting jwt...')
         jwt = Api.get_jwt()
 
-        self.logger.info('listing all devices...')
-        res = self.getDevices(jwt)
+        self.logger.info('listing all devices - no data...')
+        rc, res = self.getDevices(jwt)
         self.logger.info(res)
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
 
         self.logger.info('creating template com todos os tipos de atributos...')
@@ -178,8 +179,8 @@ class DeviceTest(BaseTest):
         self.logger.info("devices ids: " + str(devices_ids))
 
         self.logger.info('listing device - by ID...')
-        rc, list = self.getDevice(jwt, Api.get_deviceid_by_label(jwt, 'sensor2'))
-        self.logger.info('Device info: ' + str(list))
+        rc, res = self.getDevice(jwt, Api.get_deviceid_by_label(jwt, 'sensor2'))
+        self.logger.info('Device info: ' + str(res))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         """
@@ -201,8 +202,8 @@ class DeviceTest(BaseTest):
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing updated device...')
-        rc, list = self.getDevice(jwt, device_id)
-        self.logger.info('Device info: ' + str(list))
+        rc, res = self.getDevice(jwt, device_id)
+        self.logger.info('Device info: ' + str(res))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('updating device dispositivo2: change of static and metadata values......')
@@ -245,8 +246,8 @@ class DeviceTest(BaseTest):
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing updated device...')
-        rc, list = self.getDevice(jwt, device_id)
-        self.logger.info('Device info: ' + str(list))
+        rc, res = self.getDevice(jwt, device_id)
+        self.logger.info('Device info: ' + str(res))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         """
@@ -292,8 +293,8 @@ class DeviceTest(BaseTest):
         """
 
         self.logger.info('listing all devices...')
-        rc, list = self.getDevices(jwt)
-        self.logger.info('Device List: ' + str(list))
+        rc, res = self.getDevices(jwt)
+        self.logger.info('Device List: ' + str(res))
         self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing devices with parameter: page_size=4...')
