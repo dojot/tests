@@ -264,6 +264,11 @@ module.exports = {
         I.wait(1);
     },
 
+    clickAdd(){
+        I.click(this.ButtonLabel.add)
+        
+    },
+
     clickSave() {
         I.click(this.ButtonLabel.save);
     },
@@ -274,8 +279,8 @@ module.exports = {
     },
 
     seeTemplateHasCreated() {
-        I.wait(3);
         I.see('Template created.');
+        I.wait(3);
     },
 
     removeTemplate() {
