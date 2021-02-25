@@ -41,48 +41,53 @@ class TemplateTest(BaseTest):
         rc, res = Api.create_template(jwt, json.dumps(template))
 
         #return rc, res if rc != 200 else res
-        return res
+        return rc, res
 
     def updateTemplate(self, jwt: str, tempĺate_id: int, template: str):
         rc, res = Api.update_template(jwt, tempĺate_id, json.dumps(template))
         #self.assertTrue(isinstance(template_id, int), "Error on update template")
-        return res
+        return rc, res
 
     def getTemplates(self, jwt: str):
-        _, res = Api.get_templates(jwt)
+        rc, res = Api.get_templates(jwt)
         #self.assertTrue(isinstance(template_id, int), "Error on get template")
-        return res
+        return rc, res
 
     def getTemplatesWithParameters(self, jwt: str, attrs: str):
-        _, res = Api.get_templates_with_parameters(jwt, attrs)
+        rc, res = Api.get_templates_with_parameters(jwt, attrs)
         # self.assertTrue(isinstance(template_id, int), "Error on get template")
-        return res
+        return rc, res
 
     def getTemplate(self, jwt: str, template_id: int):
-        _, res = Api.get_template(jwt, template_id)
+        rc, res = Api.get_template(jwt, template_id)
         #self.assertTrue(isinstance(template_id, int), "Error on get template")
-        return res
+        return rc, res
 
     def getTemplateWithParameters(self, jwt: str, template_id: int, attrs: str):
-        _, res = Api.get_template_with_parameters(jwt, template_id, attrs)
+        rc, res = Api.get_template_with_parameters(jwt, template_id, attrs)
         # self.assertTrue(isinstance(template_id, int), "Error on get template")
-        return res
+        return rc, res
 
     def deleteTemplates(self, jwt: str):
-        res = Api.delete_templates(jwt)
+        rc, res = Api.delete_templates(jwt)
         #self.assertTrue(isinstance(template_id, int), "Error on delete template")
-        return res
+        return rc, res
 
     def deleteTemplate(self, jwt: str, template_id: int):
-        res = Api.delete_template(jwt, template_id)
+        rc, res = Api.delete_template(jwt, template_id)
         #self.assertTrue(isinstance(template_id, int), "Error on delete template")
-        return res
+        return rc, res
 
 
     def runTest(self):
         self.logger.info('Executing template test')
         self.logger.debug('getting jwt...')
         jwt = Api.get_jwt()
+
+        self.logger.info('listing all templates - no data...')
+        rc, res = self.getTemplates(jwt)
+        self.logger.debug('Template List: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         templates = []
         self.logger.debug('creating templates...')
@@ -288,7 +293,6 @@ class TemplateTest(BaseTest):
         template_ids = self.createTemplates(jwt, templates)
         self.logger.info("templates ids: " + str(template_ids))
 
-        """
         self.logger.debug('updating template SensorModel......')
         template = {
             "label": "SensorModel",
@@ -306,115 +310,137 @@ class TemplateTest(BaseTest):
             ]
         }
 
-        #template_id de 'SensorModel'
-        rc, res = self.updateTemplate(jwt, template_id2, template)
-        self.logger.info('Template updated: ' + str(template_id2) + ', SensorModel')
+
+        self.logger.debug('listing template SensorModel...')
+        rc, res = self.getTemplate(jwt, template_ids[2])
+        self.logger.debug('Template: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
+
+        rc, res = self.updateTemplate(jwt, template_ids[2], template)
+        self.logger.info('Template updated: ' + str(template_ids[2]) + ', SensorModel')
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.debug('listing updated template...')
-        list = self.getTemplate(jwt, template_id2)
-        self.logger.debug('Template: ' + str(list))
-
-        """
-
-
-        #TODO: adicionar imagem (endpoints /image e /binary)
+        rc, res = self.getTemplate(jwt, template_ids[2])
+        self.logger.debug('Template: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         """
         Lista templates
         """
 
         self.logger.info('listing all templates...')
-        list = self.getTemplates(jwt)
-        self.logger.debug('Template List: ' + str(list))
+        rc, res = self.getTemplates(jwt)
+        self.logger.debug('Template List: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: page_size...')
-        res = self.getTemplatesWithParameters(jwt, "page_size=3")
+        rc, res = self.getTemplatesWithParameters(jwt, "page_size=3")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: page_num...')
-        res = self.getTemplatesWithParameters(jwt, "page_num=2")
+        rc, res = self.getTemplatesWithParameters(jwt, "page_num=2")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: page_size=2&page_num=1...')
-        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=1")
+        rc, res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=1")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: page_size=2&page_num=2...')
-        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=2")
+        rc, res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=2")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: page_size=2&page_num=3...')
-        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=3")
+        rc, res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=3")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: page_size=2&page_num=4...')
-        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=4")
+        rc, res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=4")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: attr_format=both...')  #both: attrs + data_attrs
-        res = self.getTemplatesWithParameters(jwt, "attr_format=both")
+        rc, res = self.getTemplatesWithParameters(jwt, "attr_format=both")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: attr_format=single...')  #single: só attrs
-        res = self.getTemplatesWithParameters(jwt, "attr_format=single")
+        rc, res = self.getTemplatesWithParameters(jwt, "attr_format=single")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: attr_format=split...')  #split: só data_attrs
-        res = self.getTemplatesWithParameters(jwt, "attr_format=split")
+        rc, res = self.getTemplatesWithParameters(jwt, "attr_format=split")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: attr...')  #só é válido para atributos estáticos
-        res = self.getTemplatesWithParameters(jwt, "attr=serial=indefinido")
+        rc, res = self.getTemplatesWithParameters(jwt, "attr=serial=indefinido")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: label...')
-        res = self.getTemplatesWithParameters(jwt, "label=SensorModel")
+        rc, res = self.getTemplatesWithParameters(jwt, "label=SensorModel")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: sortBy...')
-        res = self.getTemplatesWithParameters(jwt, "sortBy=label")
+        rc, res = self.getTemplatesWithParameters(jwt, "sortBy=label")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameters...')
-        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=1&attr_format=single&attr=serial=indefinido&label=TiposAtributos&sortBy=label")
+        rc, res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=1&attr_format=single&attr=serial=indefinido&label=TiposAtributos&sortBy=label")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameters (no match): return empty...')
-        res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=1&attr_format=single&attr=serial=indefinido&label=SensorModel&sortBy=label")
+        rc, res = self.getTemplatesWithParameters(jwt, "page_size=2&page_num=1&attr_format=single&attr=serial=indefinido&label=SensorModel&sortBy=label")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing templates with parameters (nonexistent parameter ): return full...')
-        res = self.getTemplatesWithParameters(jwt, "parametro=outro")
+        rc, res = self.getTemplatesWithParameters(jwt, "parametro=outro")
         self.logger.debug('Templates: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         """
         Lista template especifico
         """
 
-        self.logger.info('listing specific template...')
+        self.logger.info('listing specific template...' + str(template_ids[2]))
         ##template SensorModel
-        res = self.getTemplate(jwt, template_ids[2])
+        rc, res = self.getTemplate(jwt, template_ids[2])
         self.logger.debug('Template info: ' + str(res))
+        #self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         self.logger.info('listing specific template with parameter: attr_format=both...')  # both: attrs + data_attrs
-        res = self.getTemplateWithParameters(jwt, template_ids[2], "attr_format=both")
+        rc, res = self.getTemplateWithParameters(jwt, template_ids[2], "attr_format=both")
         self.logger.debug('Template info: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         """
         attr_format: issue #1967
         """
 
         self.logger.info('listing specific template with parameter: attr_format=single...')  # single: só attrs
-        res = self.getTemplateWithParameters(jwt, template_ids[2], "attr_format=single")
+        rc, res = self.getTemplateWithParameters(jwt, template_ids[2], "attr_format=single")
         self.logger.debug('Template info: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         """
         attr_format: issue #1967
         """
 
         self.logger.info('listing specific template with parameter: attr_format=split...')  # split: só data_attrs
-        res = self.getTemplateWithParameters(jwt, template_ids[2], "attr_format=split")
+        rc, res = self.getTemplateWithParameters(jwt, template_ids[2], "attr_format=split")
         self.logger.debug('Template info: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         """
         Remove template especifico
@@ -422,8 +448,9 @@ class TemplateTest(BaseTest):
 
         self.logger.info('removing specific template...')
         ##template Vazio
-        res = self.deleteTemplate(jwt, template_ids[4])
+        rc, res = self.deleteTemplate(jwt, template_ids[1])
         self.logger.debug('Result: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         devices = []
         devices.append(([template_ids[2]], "device"))
@@ -431,8 +458,10 @@ class TemplateTest(BaseTest):
         self.logger.info("devices ids: " + str(devices_ids))
 
         self.logger.info('removing specific template - Templates cannot be removed as they are being used by devices...')
-        res = self.deleteTemplate(jwt, template_ids[2])
+        rc, res = self.deleteTemplate(jwt, template_ids[2])
         self.logger.info('Result: ' + str(res))
+        self.assertTrue(int(rc) == 400, "codigo inesperado")
+        self.assertTrue(res["message"] == "Templates cannot be removed as they are being used by devices", "mensagem inesperada")
 
 
         """
@@ -442,10 +471,13 @@ class TemplateTest(BaseTest):
         ##só remove se não existir devices associados
 
         Api.delete_devices(jwt)
+        """
 
         self.logger.info('removing all templates...')
-        res = self.deleteTemplates(jwt)
+        rc, res = self.deleteTemplates(jwt)
         self.logger.debug('Result: ' + str(res))
+        self.assertTrue(int(rc) == 200, "codigo inesperado")
+        """
 
 
         """
@@ -498,33 +530,37 @@ class TemplateTest(BaseTest):
                 }
             ]
         }
-        template_id = 2
-        res = self.updateTemplate(jwt, template_id, template)
+        rc, res = self.updateTemplate(jwt, 1000, template)
         self.logger.info('Result: ' + str(res))
+        self.assertTrue(int(rc) == 404, "codigo inesperado")
 
         self.logger.info('listing template - No such template...')
-        res = self.getTemplate(jwt, "123")
+        rc, res = self.getTemplate(jwt, "123")
         self.logger.info('Result: ' + str(res))
+        self.assertTrue(int(rc) == 404, "codigo inesperado")
 
         self.logger.info('listing template - internal error...')
-        res = self.getTemplate(jwt, "abc")
+        rc, res = self.getTemplate(jwt, "abc")
         self.logger.info('Result: ' + str(res))
+        self.assertTrue(int(rc) == 500, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: page_num=0...')
-        res = self.getTemplatesWithParameters(jwt, "page_num=0")
+        rc, res = self.getTemplatesWithParameters(jwt, "page_num=0")
         self.logger.info('Result: ' + str(res))
+        self.assertTrue(int(rc) == 400, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: page_size=0...')
         res = self.getTemplatesWithParameters(jwt, "page_size=0")
         self.logger.info('Result: ' + str(res))
-
+        self.assertTrue(int(rc) == 400, "codigo inesperado")
 
         self.logger.info('listing templates with parameter: page_size and page_num must be integers...')
-        res = self.getTemplatesWithParameters(jwt, "page_num=xyz&page_size=kwv")
+        rc, res = self.getTemplatesWithParameters(jwt, "page_num=xyz&page_size=kwv")
         self.logger.info('Result: ' + str(res))
+        self.assertTrue(int(rc) == 500, "codigo inesperado")
 
         self.logger.info('removing specific template - No such template...')
-        template_id = 2
-        res = self.deleteTemplate(jwt, template_id)
+        rc, res = self.deleteTemplate(jwt, 1000)
         self.logger.info('Result: ' + str(res))
+        self.assertTrue(int(rc) == 404, "codigo inesperado")
 

@@ -32,6 +32,6 @@ CONFIG = {
         }
     },
     'log': {
-        'level': os.environ.get("LOG_LEVEL", "info")
+        'level': os.environ.get("LOG_LEVEL", "debug")
     }
 }

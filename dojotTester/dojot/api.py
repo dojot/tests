@@ -81,7 +81,7 @@ class DojotAPI():
         LOGGER.debug("... created the devices")
 
     @staticmethod
-    def create_template(jwt: str or dict, data=None) -> tuple:
+    def create_template(jwt: str, data=None or dict) -> tuple:
         """
         Create the default template for test devices.
 
@@ -343,14 +343,14 @@ class DojotAPI():
 
 
     @staticmethod
-    def delete_device(jwt: str, label: str) -> tuple:
+    def delete_device(jwt: str, device_id: str) -> tuple:
         """
         Delete device.
         """
         LOGGER.debug("Deleting device...")
 
         args = {
-            "url": "{0}/device/{1}".format(CONFIG['dojot']['url'], label),
+            "url": "{0}/device/{1}".format(CONFIG['dojot']['url'], device_id),
             "headers": {
                 "Authorization": "Bearer {0}".format(jwt),
             }
@@ -495,7 +495,7 @@ class DojotAPI():
         LOGGER.debug("Retrieving information from a specific template...")
 
         args = {
-            "url": "{0}/template/{1}".format(CONFIG['dojot']['url'], template_id),
+            "url": "{0}/template/{1}".format(CONFIG['dojot']['url'], str(template_id)),
             "headers": {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer {0}".format(jwt),
@@ -535,7 +535,7 @@ class DojotAPI():
         return rc, res
 
     @staticmethod
-    def create_multiple_devices(jwt: str, template_id: str or list, label: str, attrs: str) -> tuple:
+    def create_devices_with_parameters(jwt: str, template_id: str or list, label: str, attrs: str) -> tuple:
         """
         Create a device in Dojot.
 
@@ -649,17 +649,17 @@ class DojotAPI():
 
 
     @staticmethod
-    def update_device(jwt: str, label: str, data: str or dict) -> tuple:
+    def update_device(jwt: str, device_id: str, data: str or dict) -> tuple:
         """
 
-        Returns the updated template ID or a error message.
+        Returns the updated device ID or a error message.
         """
-        LOGGER.debug("Updating template...")
+        LOGGER.debug("Updating device...")
 
         if isinstance(data, dict):
             data = json.dumps(data)
         args = {
-            "url": "{0}/device/{1}".format(CONFIG['dojot']['url'], label),
+            "url": "{0}/device/{1}".format(CONFIG['dojot']['url'], device_id),
             "headers": {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer {0}".format(jwt),
@@ -669,7 +669,7 @@ class DojotAPI():
 
         result_code, res = DojotAPI.call_api(requests.put, args)
 
-        LOGGER.debug("... updated the template")
+        LOGGER.debug("... updated the device")
         return result_code, res
 
 
@@ -698,6 +698,31 @@ class DojotAPI():
         LOGGER.debug("... retrieved history")
 
         return rc, res
+
+    @staticmethod
+    def configure_device(jwt: str, device_id: str, data: str or dict) -> tuple:
+        """
+
+        Returns the configured device or a error message.
+        """
+        LOGGER.debug("configuring device...")
+
+        if isinstance(data, dict):
+            data = json.dumps(data)
+        args = {
+            "url": "{0}/device/{1}/actuate".format(CONFIG['dojot']['url'], device_id),
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {0}".format(jwt),
+            },
+            "data": data,
+        }
+
+        result_code, res = DojotAPI.call_api(requests.put, args)
+
+        LOGGER.debug("... configured device")
+        return result_code, res
+
 
 
     @staticmethod
