@@ -5,6 +5,7 @@ import json
 import random
 import time
 
+
 class SanityTest(BaseTest):
     """
     Cria templates:
@@ -24,22 +25,26 @@ class SanityTest(BaseTest):
         - ObterAcesso
         - Token
     """
+
     def createTemplates(self, jwt: str, templates: list):
         template_ids = []
         for template in templates:
             rc, template_id = Api.create_template(jwt, json.dumps(template))
 
-            template_ids.append(template_id["template"]["id"]) if rc == 200 else template_ids.append(None)
+            template_ids.append(
+                template_id["template"]["id"]) if rc == 200 else template_ids.append(None)
         return template_ids
 
     def createDevices(self, jwt: str, devices: list):
         device_ids = []
 
         for templates, label in devices:
-            self.logger.info('adding device ' + label + ' using templates ' + str(templates))
+            self.logger.info('adding device ' + label +
+                             ' using templates ' + str(templates))
             rc, device_id = Api.create_device(jwt, templates, label)
             self.assertTrue(device_id is not None, "Error on create device")
-            device_ids.append(device_id) if rc == 200 else device_ids.append(None)
+            device_ids.append(
+                device_id) if rc == 200 else device_ids.append(None)
 
         return device_ids
 
@@ -50,17 +55,14 @@ class SanityTest(BaseTest):
             self.logger.info('adding flow..')
             rc, flow_id = Api.create_flow(jwt, flow)
             self.assertTrue(flow_id is not None, "Error on create flow")
-            flows_ids.append(flow_id["flow"]["id"]) if rc == 200 else flows_ids.append(None)
+            flows_ids.append(flow_id["flow"]["id"]
+                             ) if rc == 200 else flows_ids.append(None)
 
         return flows_ids
 
-    def createUsers(self, jwt: str, user: str):
+    # def createUsers(self, jwt: str, user: str):
 
-        Api.create_user(jwt, user)
-
-
-
-
+        # Api.create_user(jwt, user)
 
     def runTest(self):
         self.logger.info('Executing sanity test')
@@ -237,8 +239,10 @@ class SanityTest(BaseTest):
                     "type": "dynamic",
                     "value_type": "geo:point",
                     "metadata": [
-                        {"label": "unidade", "type": "meta", "value_type": "string", "static_value": "decimal"},
-                        {"label": "descricao", "type": "meta", "value_type": "string", "static_value": "localização do dispositivo"}
+                        {"label": "unidade", "type": "meta",
+                            "value_type": "string", "static_value": "decimal"},
+                        {"label": "descricao", "type": "meta", "value_type": "string",
+                            "static_value": "localização do dispositivo"}
                     ]
                 },
                 {
@@ -346,7 +350,8 @@ class SanityTest(BaseTest):
             "attrs": [
                 {"label": "license_plate", "type": "dynamic", "value_type": "string"},
                 {"label": "band", "type": "dynamic", "value_type": "integer"},
-                {"label": "coordinates", "type": "dynamic", "value_type": "geo:point"},
+                {"label": "coordinates", "type": "dynamic",
+                    "value_type": "geo:point"},
                 {"label": "vehicle_type", "type": "dynamic", "value_type": "string"},
                 {"label": "timestamp", "type": "dynamic", "value_type": "integer"}
             ]
@@ -356,12 +361,15 @@ class SanityTest(BaseTest):
         self.logger.info("templates ids: " + str(template_ids))
 
         devices = []
-        devices.append(([template_ids[0], template_ids[4]], "termometro Celsius"))
-        devices.append(([template_ids[0], template_ids[4]], "termometro Kelvin"))
+        devices.append(
+            ([template_ids[0], template_ids[4]], "termometro Celsius"))
+        devices.append(
+            ([template_ids[0], template_ids[4]], "termometro Kelvin"))
         devices.append(([template_ids[1], template_ids[4]], "barometro"))
         devices.append(([template_ids[2], template_ids[4]], "higrometro"))
         devices.append(([template_ids[3], template_ids[4]], "anemometro"))
-        devices.append(([template_ids[0], template_ids[1], template_ids[2], template_ids[3]], "instrumento de medicao"))
+        devices.append(([template_ids[0], template_ids[1],
+                         template_ids[2], template_ids[3]], "instrumento de medicao"))
         devices.append(([template_ids[5]], "linha_1"))
         devices.append(([template_ids[5]], "linha_2"))
         devices.append(([template_ids[5]], "linha_3"))
@@ -380,7 +388,7 @@ class SanityTest(BaseTest):
         self.logger.info("devices ids: " + str(devices_ids))
 
         ###################
-        #Configuring flows
+        # Configuring flows
         ###################
         flows = []
         flows.append({
@@ -477,20 +485,28 @@ class SanityTest(BaseTest):
                     "points":
                         [{"latitude": "-22.893729786643423",
                             "longitude": "-47.060708999633796"},
-                         {"latitude": "-22.888827380892344", "longitude": "-47.0570182800293"},
+                         {"latitude": "-22.888827380892344",
+                             "longitude": "-47.0570182800293"},
                          {"latitude": "-22.887720361534203",
                             "longitude": "-47.053241729736335"},
-                         {"latitude": "-22.88724592190222", "longitude": "-47.04869270324708"},
-                         {"latitude": "-22.88692962789286", "longitude": "-47.04483032226563"},
-                         {"latitude": "-22.890646035948535", "longitude": "-47.04671859741211"},
+                         {"latitude": "-22.88724592190222",
+                             "longitude": "-47.04869270324708"},
+                         {"latitude": "-22.88692962789286",
+                             "longitude": "-47.04483032226563"},
+                         {"latitude": "-22.890646035948535",
+                             "longitude": "-47.04671859741211"},
                          {"latitude": "-22.895073963731004",
                             "longitude": "-47.047061920166016"},
-                         {"latitude": "-22.90013427567171", "longitude": "-47.048091888427734"},
-                         {"latitude": "-22.905589713001355", "longitude": "-47.0463752746582"},
+                         {"latitude": "-22.90013427567171",
+                             "longitude": "-47.048091888427734"},
+                         {"latitude": "-22.905589713001355",
+                             "longitude": "-47.0463752746582"},
                          {"latitude": "-22.905115335858504",
                             "longitude": "-47.050237655639656"},
-                         {"latitude": "-22.905115335858504", "longitude": "-47.05195426940918"},
-                         {"latitude": "-22.906143150903915", "longitude": "-47.05530166625977"},
+                         {"latitude": "-22.905115335858504",
+                             "longitude": "-47.05195426940918"},
+                         {"latitude": "-22.906143150903915",
+                             "longitude": "-47.05530166625977"},
                          {"latitude": "-22.902427167370448",
                             "longitude": "-47.057275772094734"},
                          {"latitude": "-22.899027348564793",
@@ -525,41 +541,49 @@ class SanityTest(BaseTest):
                     "mode": "polyline",
                     "filter": "outside",
                     "points":
-                        [ { "latitude": "-22.893729786643423",
-                            "longitude": "-47.060708999633796" },
-                          { "latitude": "-22.888827380892344", "longitude": "-47.0570182800293" },
-                          { "latitude": "-22.887720361534203",
-                            "longitude": "-47.053241729736335" },
-                          { "latitude": "-22.88724592190222", "longitude": "-47.04869270324708" },
-                          { "latitude": "-22.88692962789286", "longitude": "-47.04483032226563" },
-                          { "latitude": "-22.890646035948535", "longitude": "-47.04671859741211" },
-                          { "latitude": "-22.895073963731004",
-                            "longitude": "-47.047061920166016" },
-                          { "latitude": "-22.90013427567171", "longitude": "-47.048091888427734" },
-                          { "latitude": "-22.905589713001355", "longitude": "-47.0463752746582" },
-                          { "latitude": "-22.905115335858504",
-                            "longitude": "-47.050237655639656" },
-                          { "latitude": "-22.905115335858504", "longitude": "-47.05195426940918" },
-                          { "latitude": "-22.906143150903915", "longitude": "-47.05530166625977" },
-                          { "latitude": "-22.902427167370448",
-                            "longitude": "-47.057275772094734" },
-                          { "latitude": "-22.899027348564793",
-                            "longitude": "-47.058563232421875" },
-                          { "latitude": "-22.896813467251835", "longitude": "-47.05890655517578" } ],
+                        [{"latitude": "-22.893729786643423",
+                            "longitude": "-47.060708999633796"},
+                         {"latitude": "-22.888827380892344",
+                             "longitude": "-47.0570182800293"},
+                         {"latitude": "-22.887720361534203",
+                            "longitude": "-47.053241729736335"},
+                         {"latitude": "-22.88724592190222",
+                             "longitude": "-47.04869270324708"},
+                         {"latitude": "-22.88692962789286",
+                             "longitude": "-47.04483032226563"},
+                         {"latitude": "-22.890646035948535",
+                             "longitude": "-47.04671859741211"},
+                         {"latitude": "-22.895073963731004",
+                            "longitude": "-47.047061920166016"},
+                         {"latitude": "-22.90013427567171",
+                             "longitude": "-47.048091888427734"},
+                         {"latitude": "-22.905589713001355",
+                             "longitude": "-47.0463752746582"},
+                         {"latitude": "-22.905115335858504",
+                            "longitude": "-47.050237655639656"},
+                         {"latitude": "-22.905115335858504",
+                             "longitude": "-47.05195426940918"},
+                         {"latitude": "-22.906143150903915",
+                             "longitude": "-47.05530166625977"},
+                         {"latitude": "-22.902427167370448",
+                            "longitude": "-47.057275772094734"},
+                         {"latitude": "-22.899027348564793",
+                            "longitude": "-47.058563232421875"},
+                         {"latitude": "-22.896813467251835", "longitude": "-47.05890655517578"}],
                     "geopoint": "payload.data.attrs.gps",
                     "x": 412,
                     "y": 372,
-                    "wires": [ [ "44d30981.231c48" ] ] },
+                    "wires": [["44d30981.231c48"]]},
                  {"id": "44d30981.231c48",
                     "type": "change",
                     "z": "3433da79.e543a6",
                     "name": "",
                     "rules":
-                        [ { "t": "set",
+                        [{"t": "set",
                             "p": "saida.mensagem",
                             "pt": "msg",
                             "to": "Não está no Cambuí",
-                            "tot": "str" } ],
+                            "tot": "str"}],
                     "action": "",
                     "property": "",
                     "from": "",
@@ -567,7 +591,7 @@ class SanityTest(BaseTest):
                     "reg": "false",
                     "x": 773,
                     "y": 365,
-                    "wires": [ [ "25c1c361.88827c" ] ] },
+                    "wires": [["25c1c361.88827c"]]},
                  {"id": "25c1c361.88827c",
                     "type": "multi device out",
                     "z": "3433da79.e543a6",
@@ -575,64 +599,64 @@ class SanityTest(BaseTest):
                     "device_source": "self",
                     "devices_source_dynamic": "",
                     "devices_source_dynamicFieldType": "msg",
-                    "devices_source_configured": [ "" ],
+                    "devices_source_configured": [""],
                     "_devices_loaded": "true",
                     "attrs": "saida",
                     "x": 1110.5,
                     "y": 225,
-                    "wires": [] }
-                  ]
+                    "wires": []}
+                 ]
         })
         flows.append({
             "name": "http - POST",
             "flow": [
-                { "id": "f66d93e3.8f42e", "type": "tab", "label": "Flow 1" },
-                { "id": "853a54b9.f53208",
-                  "type": "device template in",
-                  "z": "f66d93e3.8f42e",
-                  "name": "ônibus",
-                  "device_template": { "id": template_ids[5] },
-                  "status": "false",
-                  "device_template_id": template_ids[5],
-                  "x": 136.5,
-                  "y": 144,
-                  "wires": [ [ "ce40a438.e567c8" ] ] },
-                { "id": "784cd62a.09b088",
-                  "type": "http",
-                  "z": "f66d93e3.8f42e",
-                  "name": "",
-                  "method": "POST",
-                  "ret": "txt",
-                  "body": "reqBody",
-                  "response": "responseGet",
-                  "url": "http://ptsv2.com/t/3fbhu-1543424220/post",
-                  "x": 918.5,
-                  "y": 408,
-                  "wires": [] },
-                { "id": "ce40a438.e567c8",
-                  "type": "switch",
-                  "z": "f66d93e3.8f42e",
-                  "name": "velocidade >= 50",
-                  "property": "payload.velocidade",
-                  "propertyType": "msg",
-                  "rules": [ { "t": "gte", "v": "50", "vt": "num" } ],
-                  "checkall": "true",
-                  "outputs": "1",
-                  "x": 409.5,
-                  "y": 210,
-                  "wires": [ [ "5d51ecfa.baa4e4" ] ] },
-                { "id": "5d51ecfa.baa4e4",
-                  "type": "template",
-                  "z": "f66d93e3.8f42e",
-                  "name": "",
-                  "field": "reqBody",
-                  "fieldType": "msg",
-                  "syntax": "handlebars",
-                  "template": "{\"payload\": \"velocidade muito alta: {{payload.velocidade}} km/h!\"}",
-                  "output": "str",
-                  "x": 651.5,
-                  "y": 318,
-                  "wires": [ [ "784cd62a.09b088" ] ] }
+                {"id": "f66d93e3.8f42e", "type": "tab", "label": "Flow 1"},
+                {"id": "853a54b9.f53208",
+                 "type": "device template in",
+                 "z": "f66d93e3.8f42e",
+                 "name": "ônibus",
+                 "device_template": {"id": template_ids[5]},
+                 "status": "false",
+                 "device_template_id": template_ids[5],
+                 "x": 136.5,
+                 "y": 144,
+                 "wires": [["ce40a438.e567c8"]]},
+                {"id": "784cd62a.09b088",
+                 "type": "http",
+                 "z": "f66d93e3.8f42e",
+                 "name": "",
+                 "method": "POST",
+                 "ret": "txt",
+                 "body": "reqBody",
+                 "response": "responseGet",
+                 "url": "http://ptsv2.com/t/3fbhu-1543424220/post",
+                 "x": 918.5,
+                 "y": 408,
+                 "wires": []},
+                {"id": "ce40a438.e567c8",
+                 "type": "switch",
+                 "z": "f66d93e3.8f42e",
+                 "name": "velocidade >= 50",
+                 "property": "payload.velocidade",
+                 "propertyType": "msg",
+                 "rules": [{"t": "gte", "v": "50", "vt": "num"}],
+                 "checkall": "true",
+                 "outputs": "1",
+                 "x": 409.5,
+                 "y": 210,
+                 "wires": [["5d51ecfa.baa4e4"]]},
+                {"id": "5d51ecfa.baa4e4",
+                 "type": "template",
+                 "z": "f66d93e3.8f42e",
+                 "name": "",
+                 "field": "reqBody",
+                 "fieldType": "msg",
+                 "syntax": "handlebars",
+                 "template": "{\"payload\": \"velocidade muito alta: {{payload.velocidade}} km/h!\"}",
+                 "output": "str",
+                 "x": 651.5,
+                 "y": 318,
+                 "wires": [["784cd62a.09b088"]]}
             ]
         })
         flows.append(
@@ -889,9 +913,8 @@ class SanityTest(BaseTest):
             }
         )
 
-        #TODO: Adicionar o no remoto kelvin
+        # TODO: Adicionar o no remoto kelvin
         ##
-
 
         flows.append({
             "name": "kelvin flow",
@@ -1319,10 +1342,9 @@ class SanityTest(BaseTest):
                      "wires": [["dfbec05a.9604c8"]]}]
         })
 
-        device_id=Api.get_deviceid_by_label(jwt, 'device')
-        dispositivo_id=Api.get_deviceid_by_label(jwt,"dispositivo")
+        device_id = Api.get_deviceid_by_label(jwt, 'device')
+        dispositivo_id = Api.get_deviceid_by_label(jwt, "dispositivo")
         current_time = int(time.time() * 1000)
-
 
         flows.append({
             "name": "CRON-BATCH-BROKER",
@@ -1420,7 +1442,8 @@ class SanityTest(BaseTest):
                   "z": "A23f9977470ec28",
                   "name": "",
                   "rules":
-                      [{"t": "set", "p": "out.dummy", "pt": "msg", "to": "true", "tot": "bool"}],
+                      [{"t": "set", "p": "out.dummy", "pt": "msg",
+                          "to": "true", "tot": "bool"}],
                   "action": "",
                   "property": "",
                   "from": "",
@@ -1491,7 +1514,8 @@ class SanityTest(BaseTest):
                   "z": "A23f9977470ec28",
                   "name": "",
                   "rules":
-                      [{"t": "set", "p": "out.dummy", "pt": "msg", "to": "true", "tot": "str"}],
+                      [{"t": "set", "p": "out.dummy", "pt": "msg",
+                          "to": "true", "tot": "str"}],
                   "action": "",
                   "property": "",
                   "from": "",
@@ -1604,7 +1628,8 @@ class SanityTest(BaseTest):
                   "z": "A6a8342f975d99c",
                   "name": "",
                   "rules":
-                      [{"t": "set", "p": "out.dummy", "pt": "msg", "to": "dummy", "tot": "str"}],
+                      [{"t": "set", "p": "out.dummy", "pt": "msg",
+                          "to": "dummy", "tot": "str"}],
                   "action": "",
                   "property": "",
                   "from": "",
@@ -1717,7 +1742,8 @@ class SanityTest(BaseTest):
                   "z": "A2720aa5be2e886",
                   "name": "",
                   "rules":
-                      [{"t": "set", "p": "out.dummy", "pt": "msg", "to": "dummy", "tot": "str"}],
+                      [{"t": "set", "p": "out.dummy", "pt": "msg",
+                          "to": "dummy", "tot": "str"}],
                   "action": "",
                   "property": "",
                   "from": "",
@@ -2628,60 +2654,55 @@ class SanityTest(BaseTest):
                   "wires": [["d708a3a6.a6735"]]}]
         })
 
-
         flows_ids = self.createFlows(jwt, flows)
 
         self.logger.info("Flows created. IDs: " + str(flows_ids))
 
+        # group1 = {"name": "viewer" + str(random.randint(0, 100)),
+        #           "description": "Grupo com acesso somente para visualizar as informações"}
+        # rc, response = Api.create_group(jwt, group1)
+        # self.logger.debug(f"Group group1 creation return the result code: {rc} and response: {response}")
+        # self.assertTrue(int(rc) == 200, "Error on create group")
+        # group1_id = response["id"]
 
-        group1 = {"name": "viewer" + str(random.randint(0, 100)),
-                  "description": "Grupo com acesso somente para visualizar as informações"}
-        rc, response = Api.create_group(jwt, group1)
-        self.logger.debug(f"Group group1 creation return the result code: {rc} and response: {response}")
-        self.assertTrue(int(rc) == 200, "Error on create group")
-        group1_id = response["id"]
+        # self.logger.info("Groups created. IDs: " + str(group1_id))
 
-        self.logger.info("Groups created. IDs: " + str(group1_id))
+        # #TODO adicionar as permissoes ao grupo
 
-        #TODO adicionar as permissoes ao grupo
+        # rc, res = Api.add_permission(jwt, group1_id, "2")
+        # self.logger.info("Permissions added to the group: " + str(group1_id))
+        # self.assertTrue(int(rc) == 200, "codigo inesperado")
 
-        rc, res = Api.add_permission(jwt, group1_id, "2")
-        self.logger.info("Permissions added to the group: " + str(group1_id))
-        self.assertTrue(int(rc) == 200, "codigo inesperado")
+        # rc, res = Api.add_permission(jwt, group1_id, "4")
+        # self.logger.info("Permissions added to the group: " + str(group1_id))
+        # self.assertTrue(int(rc) == 200, "codigo inesperado")
 
-        rc, res = Api.add_permission(jwt, group1_id, "4")
-        self.logger.info("Permissions added to the group: " + str(group1_id))
-        self.assertTrue(int(rc) == 200, "codigo inesperado")
-
-        rc, res = Api.add_permission(jwt, group1_id, "6")
-        self.logger.info("Permissions added to the group: " + str(group1_id))
-        self.assertTrue(int(rc) == 200, "codigo inesperado")
-
+        # rc, res = Api.add_permission(jwt, group1_id, "6")
+        # self.logger.info("Permissions added to the group: " + str(group1_id))
+        # self.assertTrue(int(rc) == 200, "codigo inesperado")
 
         # adicionar usuario
 
-        user1 = {"username": "bete",
-            "service": "teste",
-            "email": "bete@noemail.com",
-            "name": "Elisabete",
-            "profile": "admin"
-            }
-        self.createUsers(jwt, user1)
-        self.logger.info("User created: bete")
+        # user1 = {"username": "bete",
+        #     "service": "teste",
+        #     "email": "bete@noemail.com",
+        #     "name": "Elisabete",
+        #     "profile": "admin"
+        #     }
+        # self.createUsers(jwt, user1)
+        # self.logger.info("User created: bete")
 
+        # user2 = {
+        #     "username": "maria",
+        #     "service": "teste",
+        #     "email": "maria@noemail.com",
+        #     "name": "Maria",
+        #     "profile": "admin"
+        #     }
+        # self.createUsers(jwt, user2)
+        # self.logger.info("User created: maria")
 
-        user2 = {
-            "username": "maria",
-            "service": "teste",
-            "email": "maria@noemail.com",
-            "name": "Maria",
-            "profile": "admin"
-            }
-        self.createUsers(jwt, user2)
-        self.logger.info("User created: maria")
-
-
-        #TODO listar tenants
+        # TODO listar tenants
 
         # publicações
 
@@ -2690,10 +2711,10 @@ class SanityTest(BaseTest):
         dev1 = MQTTClient(dev1_id)
         self.logger.info("publicando com dispositivo: " + dev1_id)
         dev1.publish(dev1_topic,
-                     {"gps":"-22.890970, -47.063006","velocidade":50,"passageiros":30,"operacional":False})
+                     {"gps": "-22.890970, -47.063006", "velocidade": 50, "passageiros": 30, "operacional": False})
         time.sleep(1)
         dev1.publish(dev1_topic,
-                     {"gps":"-22.893619, -47.052921","velocidade":40,"passageiros":45,"operacional":True})
+                     {"gps": "-22.893619, -47.052921", "velocidade": 40, "passageiros": 45, "operacional": True})
         time.sleep(5)
 
         dev2_id = Api.get_deviceid_by_label(jwt, "dispositivo")
@@ -2702,15 +2723,15 @@ class SanityTest(BaseTest):
         self.logger.info("publicando com dispositivo: " + dev2_id)
         dev2.publish(dev2_topic, {"int": 2})
 
-        ## TODO: obter histórico do dev1_id
+        # TODO: obter histórico do dev1_id
 
-        Api.get_history_device(jwt,dev1_id)
+        Api.get_history_device(jwt, dev1_id)
 
         time.sleep(1)
 
-        ## TODO: obter histórico do dev2_id
+        # TODO: obter histórico do dev2_id
 
-        Api.get_history_device(jwt,dev2_id)
+        Api.get_history_device(jwt, dev2_id)
 
         time.sleep(1)
 
@@ -2861,7 +2882,3 @@ class SanityTest(BaseTest):
 
         # update device linha_4
         # delete device linha_4
-
-
-
-

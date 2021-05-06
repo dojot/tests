@@ -179,92 +179,89 @@ class DojotAPI():
         LOGGER.debug("... flow created")
         return result_code, res
 
-    @staticmethod
-    def create_group(jwt: str, group: str) -> tuple:
-        """
-        Create a group in Dojot.
+    # @staticmethod
+    # def create_group(jwt: str, group: str) -> tuple:
+    #     """
+    #     Create a group in Dojot.
 
-        Parameters:
-            jwt: JWT authorization.
-            group: group definition.
+    #     Parameters:
+    #         jwt: JWT authorization.
+    #         group: group definition.
 
+    #     Returns the created group ID.
+    #     """
+    #     LOGGER.debug("Creating group...")
 
-        Returns the created group ID.
-        """
-        LOGGER.debug("Creating group...")
+    #     args = {
+    #         "url": "{0}/auth/pap/group".format(CONFIG['dojot']['url']),
+    #         "headers": {
+    #             "Content-Type": "application/json",
+    #             "Authorization": "Bearer {0}".format(jwt),
+    #         },
+    #         "data": json.dumps(group),
+    #     }
 
-        args = {
-            "url": "{0}/auth/pap/group".format(CONFIG['dojot']['url']),
-            "headers": {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer {0}".format(jwt),
-            },
-            "data": json.dumps(group),
-        }
+    #     result_code, res = DojotAPI.call_api(requests.post, args)
 
-        result_code, res = DojotAPI.call_api(requests.post, args)
+    #     LOGGER.debug("... group created")
 
-        LOGGER.debug("... group created")
+    #     # o retorno do comando é: {"status": 200, "id": 6}. Como obter só o ID?
 
-        # o retorno do comando é: {"status": 200, "id": 6}. Como obter só o ID?
+    #     return result_code, res
 
-        return result_code, res
+    # @staticmethod
+    # def add_permission(jwt: str, group: str, permission: str) -> tuple:
+    #     """
+    #     Add permission a group in Dojot.
 
-    @staticmethod
-    def add_permission(jwt: str, group: str, permission: str) -> tuple:
-        """
-        Add permission a group in Dojot.
+    #     Parameters:
+    #         jwt: JWT authorization.
+    #         group: group receiving permission
+    #         permission: permission definition
 
-        Parameters:
-            jwt: JWT authorization.
-            group: group receiving permission
-            permission: permission definition
+    #     Returns the created group ID.
+    #     """
+    #     LOGGER.debug("Adding permission...")
 
+    #     args = {
+    #         "url": "{0}/auth/pap/grouppermissions/{1}/{2}".format(CONFIG['dojot']['url'], group, permission),
+    #         "headers": {
+    #             "Content-Type": "application/json",
+    #             "Authorization": "Bearer {0}".format(jwt),
+    #         },
+    #     }
 
-        Returns the created group ID.
-        """
-        LOGGER.debug("Adding permission...")
+    #     result_code, res = DojotAPI.call_api(requests.post, args)
 
-        args = {
-            "url": "{0}/auth/pap/grouppermissions/{1}/{2}".format(CONFIG['dojot']['url'], group, permission),
-            "headers": {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer {0}".format(jwt),
-            },
-        }
+    #     LOGGER.debug("... permission added")
+    #     return result_code, res
 
-        result_code, res = DojotAPI.call_api(requests.post, args)
+    # @staticmethod
+    # def create_user(jwt: str, user: str) -> tuple:
+    #     """
+    #     Create a user in Dojot.
 
-        LOGGER.debug("... permission added")
-        return result_code, res
+    #     Parameters:
+    #         jwt: JWT authorization.
+    #         user: user data.
 
-    @staticmethod
-    def create_user(jwt: str, user: str) -> tuple:
-        """
-        Create a user in Dojot.
+    #     Returns the created user ID.
+    #     """
+    #     LOGGER.debug("Creating user...")
 
-        Parameters:
-            jwt: JWT authorization.
-            user: user data.
+    #     args = {
+    #         "url": "{0}/auth/user".format(CONFIG['dojot']['url']),
+    #         "headers": {
+    #             "Content-Type": "application/json",
+    #             "Authorization": "Bearer {0}".format(jwt),
+    #         },
+    #         "data": json.dumps(user),
+    #     }
 
+    #     result_code, res = DojotAPI.call_api(requests.post, args)
 
-        Returns the created user ID.
-        """
-        LOGGER.debug("Creating user...")
-
-        args = {
-            "url": "{0}/auth/user".format(CONFIG['dojot']['url']),
-            "headers": {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer {0}".format(jwt),
-            },
-            "data": json.dumps(user),
-        }
-
-        result_code, res = DojotAPI.call_api(requests.post, args)
-
-        LOGGER.debug("... user created")
-        return result_code, res
+    #     LOGGER.debug("... user created")
+    #     return result_code, res
 
     @staticmethod
     def get_deviceid_by_label(jwt: str, label: str) -> str or None:
