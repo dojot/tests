@@ -31,20 +31,19 @@ class DojotAPI():
         LOGGER.debug("Retrieving JWT...")
 
         args = {
-            "url": "{0}/auth".format(CONFIG['dojot']['url']),
-            "data": json.dumps({
+            "url": "{0}/auth/realms/{1}/protocol/openid-connect/token".format(CONFIG['dojot']['url'], CONFIG['app']['tenant']),
+            "data": {
                 "username": CONFIG['dojot']['user'],
-                "passwd": CONFIG['dojot']['passwd'],
-            }),
-            "headers": {
-                "Content-Type": "application/json"
-            },
+                "password": CONFIG['dojot']['passwd'],
+                "client_id": "cli",
+                "grant_type": "password",
+            }
         }
 
         _, res = DojotAPI.call_api(requests.post, args)
 
         LOGGER.debug(".. retrieved JWT")
-        return res["jwt"]
+        return res["access_token"]
 
     @staticmethod
     def create_devices(jwt: str, template_id: str, total: int, batch: int) -> None:
@@ -74,7 +73,8 @@ class DojotAPI():
                 "attrs": {},
                 "label": "CargoContainer_{0}".format(i)
             })
-            args["url"] = "{0}/device?count={1}&verbose=false".format(CONFIG['dojot']['url'], load)
+            args["url"] = "{0}/device?count={1}&verbose=false".format(
+                CONFIG['dojot']['url'], load)
 
             DojotAPI.call_api(requests.post, args)
 
@@ -179,93 +179,89 @@ class DojotAPI():
         LOGGER.debug("... flow created")
         return result_code, res
 
-    @staticmethod
-    def create_group(jwt: str, group: str) -> tuple:
-        """
-        Create a group in Dojot.
+    # @staticmethod
+    # def create_group(jwt: str, group: str) -> tuple:
+    #     """
+    #     Create a group in Dojot.
 
-        Parameters:
-            jwt: JWT authorization.
-            group: group definition.
+    #     Parameters:
+    #         jwt: JWT authorization.
+    #         group: group definition.
 
+    #     Returns the created group ID.
+    #     """
+    #     LOGGER.debug("Creating group...")
 
-        Returns the created group ID.
-        """
-        LOGGER.debug("Creating group...")
+    #     args = {
+    #         "url": "{0}/auth/pap/group".format(CONFIG['dojot']['url']),
+    #         "headers": {
+    #             "Content-Type": "application/json",
+    #             "Authorization": "Bearer {0}".format(jwt),
+    #         },
+    #         "data": json.dumps(group),
+    #     }
 
-        args = {
-            "url": "{0}/auth/pap/group".format(CONFIG['dojot']['url']),
-            "headers": {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer {0}".format(jwt),
-            },
-            "data": json.dumps(group),
-        }
+    #     result_code, res = DojotAPI.call_api(requests.post, args)
 
-        result_code, res = DojotAPI.call_api(requests.post, args)
+    #     LOGGER.debug("... group created")
 
+    #     # o retorno do comando é: {"status": 200, "id": 6}. Como obter só o ID?
 
-        LOGGER.debug("... group created")
+    #     return result_code, res
 
-        ## o retorno do comando é: {"status": 200, "id": 6}. Como obter só o ID?
+    # @staticmethod
+    # def add_permission(jwt: str, group: str, permission: str) -> tuple:
+    #     """
+    #     Add permission a group in Dojot.
 
-        return result_code, res
+    #     Parameters:
+    #         jwt: JWT authorization.
+    #         group: group receiving permission
+    #         permission: permission definition
 
-    @staticmethod
-    def add_permission(jwt: str, group: str, permission: str) -> tuple:
-        """
-        Add permission a group in Dojot.
+    #     Returns the created group ID.
+    #     """
+    #     LOGGER.debug("Adding permission...")
 
-        Parameters:
-            jwt: JWT authorization.
-            group: group receiving permission
-            permission: permission definition
+    #     args = {
+    #         "url": "{0}/auth/pap/grouppermissions/{1}/{2}".format(CONFIG['dojot']['url'], group, permission),
+    #         "headers": {
+    #             "Content-Type": "application/json",
+    #             "Authorization": "Bearer {0}".format(jwt),
+    #         },
+    #     }
 
+    #     result_code, res = DojotAPI.call_api(requests.post, args)
 
-        Returns the created group ID.
-        """
-        LOGGER.debug("Adding permission...")
+    #     LOGGER.debug("... permission added")
+    #     return result_code, res
 
-        args = {
-            "url": "{0}/auth/pap/grouppermissions/{1}/{2}".format(CONFIG['dojot']['url'], group, permission),
-            "headers": {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer {0}".format(jwt),
-            },
-        }
+    # @staticmethod
+    # def create_user(jwt: str, user: str) -> tuple:
+    #     """
+    #     Create a user in Dojot.
 
-        result_code, res = DojotAPI.call_api(requests.post, args)
+    #     Parameters:
+    #         jwt: JWT authorization.
+    #         user: user data.
 
-        LOGGER.debug("... permission added")
-        return result_code, res
+    #     Returns the created user ID.
+    #     """
+    #     LOGGER.debug("Creating user...")
 
-    @staticmethod
-    def create_user(jwt: str, user: str) -> tuple:
-        """
-        Create a user in Dojot.
+    #     args = {
+    #         "url": "{0}/auth/user".format(CONFIG['dojot']['url']),
+    #         "headers": {
+    #             "Content-Type": "application/json",
+    #             "Authorization": "Bearer {0}".format(jwt),
+    #         },
+    #         "data": json.dumps(user),
+    #     }
 
-        Parameters:
-            jwt: JWT authorization.
-            user: user data.
+    #     result_code, res = DojotAPI.call_api(requests.post, args)
 
-
-        Returns the created user ID.
-        """
-        LOGGER.debug("Creating user...")
-
-        args = {
-            "url": "{0}/auth/user".format(CONFIG['dojot']['url']),
-            "headers": {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer {0}".format(jwt),
-            },
-            "data": json.dumps(user),
-        }
-
-        result_code, res = DojotAPI.call_api(requests.post, args)
-
-        LOGGER.debug("... user created")
-        return result_code, res
+    #     LOGGER.debug("... user created")
+    #     return result_code, res
 
     @staticmethod
     def get_deviceid_by_label(jwt: str, label: str) -> str or None:
@@ -296,7 +292,6 @@ class DojotAPI():
 
         return devices_id
 
-
     @staticmethod
     def update_template(jwt: str, template_id: int, data: str) -> tuple:
         """
@@ -321,7 +316,6 @@ class DojotAPI():
         LOGGER.debug("... updated the template")
         return result_code, res
 
-
     @staticmethod
     def delete_devices(jwt: str) -> tuple:
         """
@@ -340,7 +334,6 @@ class DojotAPI():
 
         LOGGER.debug("... deleted devices")
         return rc, res
-
 
     @staticmethod
     def delete_device(jwt: str, device_id: str) -> tuple:
@@ -380,7 +373,6 @@ class DojotAPI():
         LOGGER.debug("... deleted templates")
 
         return rc, res
-
 
     @staticmethod
     def delete_template(jwt: str, template_id: int) -> tuple:
@@ -429,7 +421,6 @@ class DojotAPI():
         LOGGER.debug("... retrieved the devices")
 
         return devices_ids
-
 
     @staticmethod
     def get_templates(jwt: str) -> tuple:
@@ -481,7 +472,6 @@ class DojotAPI():
         LOGGER.debug("... retrieved all templates")
 
         return rc, res
-
 
     @staticmethod
     def get_template(jwt: str, template_id: int) -> tuple:
@@ -569,7 +559,6 @@ class DojotAPI():
         LOGGER.debug("... devices created ")
         return result_code, res
 
-
     @staticmethod
     def get_all_devices(jwt: str) -> tuple:
         """
@@ -594,7 +583,6 @@ class DojotAPI():
 
         LOGGER.debug("... devices created ")
         return result_code, res
-
 
     @staticmethod
     def get_single_device(jwt: str, device_id: str) -> tuple:
@@ -647,7 +635,6 @@ class DojotAPI():
 
         return rc, res
 
-
     @staticmethod
     def update_device(jwt: str, device_id: str, data: str or dict) -> tuple:
         """
@@ -671,7 +658,6 @@ class DojotAPI():
 
         LOGGER.debug("... updated the device")
         return result_code, res
-
 
     @staticmethod
     def get_history_device(jwt: str, label: str) -> tuple:
@@ -723,8 +709,6 @@ class DojotAPI():
         LOGGER.debug("... configured device")
         return result_code, res
 
-
-
     @staticmethod
     def divide_loads(total: int, batch: int) -> List:
         """
@@ -760,7 +744,7 @@ class DojotAPI():
         for _ in range(CONFIG['dojot']['api']['retries'] + 1):
             try:
                 res = func(**args)
-                #res.raise_for_status()
+                # res.raise_for_status()
 
             except Exception as exception:
                 LOGGER.debug(str(exception))
@@ -769,4 +753,5 @@ class DojotAPI():
             else:
                 return res.status_code, res.json()
 
-        raise APICallError("exceeded the number of retries to {0}".format(args['url']))
+        raise APICallError(
+            "exceeded the number of retries to {0}".format(args['url']))
